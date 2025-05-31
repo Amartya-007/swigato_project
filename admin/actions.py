@@ -108,12 +108,14 @@ def update_order_status_admin():
     order_id = get_validated_input(
         prompt="Enter the ID of the order to update status: ",
         validation_type="integer",
-        error_message="Invalid Order ID format. Please enter a number."
+        custom_error_message="Invalid Order ID format. Please enter a number."
     )
     if order_id is None:
         return
 
-    selected_order = next((o for o in orders if o.order_id == order_id), None)
+    # Ensure both o.order_id and order_id are compared as integers
+    selected_order = next((o for o in orders if int(o.order_id) == int(order_id)), None)
+
     if not selected_order:
         console.print(f"[red]Order with ID {order_id} not found.[/red]")
         return
@@ -121,8 +123,8 @@ def update_order_status_admin():
     console.print(f"Current status of order {order_id}: [yellow]{selected_order.status}[/yellow]")
     new_status = get_validated_input(
         prompt="Enter the new status (e.g., Processing, Shipped, Delivered, Cancelled): ",
-        validation_type="non_empty_string",
-        error_message="Status cannot be empty."
+        validation_type="not_empty",
+        custom_error_message="Status cannot be empty."
     )
     if not new_status:
         return
@@ -169,7 +171,7 @@ def delete_review_admin():
     review_id = get_validated_input(
         prompt="Enter the ID of the review to delete: ",
         validation_type="integer",
-        error_message="Invalid Review ID format. Please enter a number."
+        custom_error_message="Invalid Review ID format. Please enter a number."
     )
     if review_id is None:
         return
@@ -177,7 +179,7 @@ def delete_review_admin():
     confirm = get_validated_input(
         prompt=f"Are you sure you want to delete review {review_id}? (yes/no): ",
         validation_type="yes_no",
-        error_message="Please enter 'yes' or 'no'."
+        custom_error_message="Please enter 'yes' or 'no'."
     )
 
     if confirm == 'yes':
@@ -238,21 +240,21 @@ def add_restaurant_admin(admin_user):
     name = get_validated_input(
         prompt="Enter restaurant name: ",
         validation_type="non_empty_string",
-        error_message="Restaurant name cannot be empty."
+        custom_error_message="Restaurant name cannot be empty."
     )
     if not name: return
 
     cuisine_type = get_validated_input(
         prompt="Enter cuisine type: ",
         validation_type="non_empty_string",
-        error_message="Cuisine type cannot be empty."
+        custom_error_message="Cuisine type cannot be empty."
     )
     if not cuisine_type: return
 
     address = get_validated_input(
         prompt="Enter address: ",
         validation_type="non_empty_string",
-        error_message="Address cannot be empty."
+        custom_error_message="Address cannot be empty."
     )
     if not address: return
 
@@ -272,7 +274,7 @@ def edit_restaurant_admin(admin_user):
     restaurant_id = get_validated_input(
         prompt="Enter ID of the restaurant to edit (or 0 to cancel): ",
         validation_type="integer_or_cancel",
-        error_message="Invalid ID. Please enter a number or 0 to cancel.",
+        custom_error_message="Invalid ID. Please enter a number or 0 to cancel.",
         cancel_value=0
     )
     if restaurant_id is None or restaurant_id == 0:
@@ -320,7 +322,7 @@ def delete_restaurant_admin(admin_user):
     restaurant_id = get_validated_input(
         prompt="Enter ID of the restaurant to DELETE (or 0 to cancel): ",
         validation_type="integer_or_cancel",
-        error_message="Invalid ID. Please enter a number or 0 to cancel.",
+        custom_error_message="Invalid ID. Please enter a number or 0 to cancel.",
         cancel_value=0
     )
     if restaurant_id is None or restaurant_id == 0:
@@ -336,7 +338,7 @@ def delete_restaurant_admin(admin_user):
     confirm = get_validated_input(
         prompt=f"[bold red]Are you sure you want to delete '{restaurant_to_delete.name}' (ID: {restaurant_id})? This will also delete all its menu items and reviews. (yes/no): [/bold red]",
         validation_type="yes_no",
-        error_message="Please enter 'yes' or 'no'."
+        custom_error_message="Please enter 'yes' or 'no'."
     )
 
     if confirm == 'yes':
@@ -357,7 +359,7 @@ def manage_restaurant_menu_items_admin(admin_user):
     restaurant_id = get_validated_input(
         prompt="Enter ID of the restaurant whose menu you want to manage (or 0 to cancel): ",
         validation_type="integer_or_cancel",
-        error_message="Invalid ID. Please enter a number or 0 to cancel.",
+        custom_error_message="Invalid ID. Please enter a number or 0 to cancel.",
         cancel_value=0
     )
     if restaurant_id is None or restaurant_id == 0:
@@ -382,7 +384,7 @@ def manage_restaurant_menu_items_admin(admin_user):
         choice = get_validated_input(
             prompt="Choose an action: ",
             validation_type="integer_range",
-            error_message="Invalid choice. Please enter a number between 0 and 3.",
+            custom_error_message="Invalid choice. Please enter a number between 0 and 3.",
             min_value=0,
             max_value=3
         )
@@ -403,28 +405,28 @@ def add_menu_item_admin(admin_user, restaurant: Restaurant):
     name = get_validated_input(
         prompt="Enter item name: ",
         validation_type="non_empty_string",
-        error_message="Item name cannot be empty."
+        custom_error_message="Item name cannot be empty."
     )
     if not name: return
 
     description = get_validated_input(
         prompt="Enter item description: ",
         validation_type="non_empty_string",
-        error_message="Description cannot be empty."
+        custom_error_message="Description cannot be empty."
     )
     if not description: return
 
     price = get_validated_input(
         prompt="Enter item price: ",
         validation_type="float_positive",
-        error_message="Invalid price. Please enter a positive number."
+        custom_error_message="Invalid price. Please enter a positive number."
     )
     if price is None: return
 
     category = get_validated_input(
         prompt="Enter item category (e.g., Main Course, Appetizer, Drinks): ",
         validation_type="non_empty_string",
-        error_message="Category cannot be empty."
+        custom_error_message="Category cannot be empty."
     )
     if not category: return
 
@@ -442,7 +444,7 @@ def edit_menu_item_admin(admin_user, restaurant: Restaurant):
     item_id = get_validated_input(
         prompt="Enter ID of the menu item to edit (or 0 to cancel): ",
         validation_type="integer_or_cancel",
-        error_message="Invalid ID. Please enter a number or 0 to cancel.",
+        custom_error_message="Invalid ID. Please enter a number or 0 to cancel.",
         cancel_value=0
     )
     if item_id is None or item_id == 0:
@@ -474,7 +476,7 @@ def edit_menu_item_admin(admin_user, restaurant: Restaurant):
     new_price = get_validated_input(
         prompt="Enter new price (or press Enter to keep current): ",
         validation_type="optional_float_positive",
-        error_message="Invalid price. Must be a positive number.",
+        custom_error_message="Invalid price. Must be a positive number.",
         default_value=menu_item_to_edit.price
     )
     
@@ -498,7 +500,7 @@ def delete_menu_item_admin(admin_user, restaurant: Restaurant):
     item_id = get_validated_input(
         prompt="Enter ID of the menu item to DELETE (or 0 to cancel): ",
         validation_type="integer_or_cancel",
-        error_message="Invalid ID. Please enter a number or 0 to cancel.",
+        custom_error_message="Invalid ID. Please enter a number or 0 to cancel.",
         cancel_value=0
     )
     if item_id is None or item_id == 0:
@@ -514,7 +516,7 @@ def delete_menu_item_admin(admin_user, restaurant: Restaurant):
     confirm = get_validated_input(
         prompt=f"[bold red]Are you sure you want to delete '{menu_item_to_delete.name}' (ID: {item_id}) from {restaurant.name}? (yes/no): [/bold red]",
         validation_type="yes_no",
-        error_message="Please enter 'yes' or 'no'."
+        custom_error_message="Please enter 'yes' or 'no'."
     )
     if confirm == 'yes':
         if menu_item_to_delete.delete():
