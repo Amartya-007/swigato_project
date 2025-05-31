@@ -1,0 +1,329 @@
+2025-06-01 01:22:54 [Swigato Log]: App started
+2025-06-01 01:22:54 [Swigato Log]: Initializing database tables...
+2025-06-01 01:22:54 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:54 [Swigato Log]: Users table initialized.
+2025-06-01 01:22:54 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:54 [Swigato Log]: Restaurants table initialized.
+2025-06-01 01:22:54 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:54 [Swigato Log]: Menu items table initialized.
+2025-06-01 01:22:54 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:54 [Swigato Log]: Reviews table initialized.
+2025-06-01 01:22:54 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:54 [Swigato Log]: Orders table initialized.
+2025-06-01 01:22:54 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:54 [Swigato Log]: Order items table initialized.
+2025-06-01 01:22:54 [Swigato Log]: Database initialization complete.
+2025-06-01 01:22:54 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: User 'admin' created with ID 1, Admin status: True.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Default admin user 'admin' created successfully.
+2025-06-01 01:22:55 [Swigato Log]: Initial data setup: Populating sample restaurant data.
+2025-06-01 01:22:55 [Swigato Log]: Attempting to populate sample restaurant data...
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Adding restaurant: Paradise Biryani
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Restaurant 'Paradise Biryani' created with ID 1.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Hyderabadi Chicken Biryani' created with ID 1 for restaurant ID 1.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Mutton Biryani' created with ID 2 for restaurant ID 1.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Veg Biryani' created with ID 3 for restaurant ID 1.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Masala Chai' created with ID 4 for restaurant ID 1.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Lassi (Sweet)' created with ID 5 for restaurant ID 1.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Qubani ka Meetha' created with ID 6 for restaurant ID 1.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Adding restaurant: Cafe Coffee Day
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Restaurant 'Cafe Coffee Day' created with ID 2.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Cold Coffee' created with ID 7 for restaurant ID 2.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Cappuccino' created with ID 8 for restaurant ID 2.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Cafe Latte' created with ID 9 for restaurant ID 2.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Chocolate Brownie' created with ID 10 for restaurant ID 2.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Adding restaurant: Punjabi Tadka
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Restaurant 'Punjabi Tadka' created with ID 3.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Butter Chicken' created with ID 11 for restaurant ID 3.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Dal Makhani' created with ID 12 for restaurant ID 3.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Paneer Tikka Masala' created with ID 13 for restaurant ID 3.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Gulab Jamun' created with ID 14 for restaurant ID 3.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: MenuItem 'Sweet Lassi' created with ID 15 for restaurant ID 3.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Sample restaurant data population check complete.
+2025-06-01 01:22:55 [Swigato Log]: Initial data setup: Populating sample reviews.
+2025-06-01 01:22:55 [Swigato Log]: Attempting to populate sample review data...
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: User 'Alice' created with ID 2, Admin status: False.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Sample user 'Alice' created with ID 2 for reviews.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: User 'Bob' created with ID 3, Admin status: False.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Sample user 'Bob' created with ID 3 for reviews.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Review 1 added for restaurant 1 by user Alice.
+2025-06-01 01:22:55 [Swigato Log]: Added sample review for 'Paradise Biryani' by 'Alice'.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Review 2 added for restaurant 1 by user Bob.
+2025-06-01 01:22:55 [Swigato Log]: Added sample review for 'Paradise Biryani' by 'Bob'.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Review 3 added for restaurant 2 by user Alice.
+2025-06-01 01:22:55 [Swigato Log]: Added sample review for 'Cafe Coffee Day' by 'Alice'.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Review 4 added for restaurant 3 by user Bob.
+2025-06-01 01:22:55 [Swigato Log]: Added sample review for 'Punjabi Tadka' by 'Bob'.
+2025-06-01 01:22:55 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:22:55 [Swigato Log]: Review 5 added for restaurant 3 by user Alice.
+2025-06-01 01:22:55 [Swigato Log]: Added sample review for 'Punjabi Tadka' by 'Alice'.
+2025-06-01 01:22:55 [Swigato Log]: Sample review data population check complete.
+2025-06-01 01:23:02 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:23:02 [Swigato Log]: User 'admin' (ID: 1) logged in successfully.
+2025-06-01 01:23:05 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:23:16 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:23:16 [Swigato Log]: Review 2 deleted successfully.
+2025-06-01 01:23:16 [Swigato Log]: Admin deleted review 2.
+2025-06-01 01:23:22 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:23:22 [Swigato Log]: Admin 'admin' viewed all users.
+2025-06-01 01:34:33 [Swigato Log]: App started
+2025-06-01 01:34:33 [Swigato Log]: Initializing database tables...
+2025-06-01 01:34:33 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:34:33 [Swigato Log]: Users table initialized.
+2025-06-01 01:34:33 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:34:33 [Swigato Log]: Restaurants table initialized.
+2025-06-01 01:34:33 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:34:33 [Swigato Log]: Menu items table initialized.
+2025-06-01 01:34:33 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:34:33 [Swigato Log]: Reviews table initialized.
+2025-06-01 01:34:33 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:34:33 [Swigato Log]: Orders table initialized.
+2025-06-01 01:34:33 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:34:33 [Swigato Log]: Order items table initialized.
+2025-06-01 01:34:33 [Swigato Log]: Database initialization complete.
+2025-06-01 01:34:33 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:34:33 [Swigato Log]: Admin user already exists. Skipping default admin creation.
+2025-06-01 01:34:33 [Swigato Log]: Initial data setup: Populating sample restaurant data.
+2025-06-01 01:34:33 [Swigato Log]: Attempting to populate sample restaurant data...
+2025-06-01 01:34:33 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:34:33 [Swigato Log]: Restaurant 'Paradise Biryani' already exists. Skipping.
+2025-06-01 01:34:33 [Swigato Log]: Restaurant 'Cafe Coffee Day' already exists. Skipping.
+2025-06-01 01:34:33 [Swigato Log]: Restaurant 'Punjabi Tadka' already exists. Skipping.
+2025-06-01 01:34:33 [Swigato Log]: Sample restaurant data population check complete.
+2025-06-01 01:34:33 [Swigato Log]: Initial data setup: Populating sample reviews.
+2025-06-01 01:34:33 [Swigato Log]: Attempting to populate sample review data...
+2025-06-01 01:34:33 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:34:33 [Swigato Log]: Sample user 'Alice' already exists with ID 2.
+2025-06-01 01:34:33 [Swigato Log]: Sample user 'Bob' already exists with ID 3.
+2025-06-01 01:34:33 [Swigato Log]: Sample review for 'Paradise Biryani' by 'Alice' (comment starting with 'Absolutely delicious...') already exists. Skipping.
+2025-06-01 01:34:33 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:34:33 [Swigato Log]: Review 6 added for restaurant 1 by user Bob.
+2025-06-01 01:34:33 [Swigato Log]: Added sample review for 'Paradise Biryani' by 'Bob'.
+2025-06-01 01:34:33 [Swigato Log]: Sample review for 'Cafe Coffee Day' by 'Alice' (comment starting with 'Coffee was okay, pla...') already exists. Skipping.
+2025-06-01 01:34:33 [Swigato Log]: Sample review for 'Punjabi Tadka' by 'Bob' (comment starting with 'Butter chicken was a...') already exists. Skipping.
+2025-06-01 01:34:33 [Swigato Log]: Sample review for 'Punjabi Tadka' by 'Alice' (comment starting with 'Great North Indian f...') already exists. Skipping.
+2025-06-01 01:34:33 [Swigato Log]: Sample review data population check complete.
+2025-06-01 01:35:49 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:35:50 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:35:50 [Swigato Log]: User 'testuser1' created with ID 4, Admin status: False.
+2025-06-01 01:35:50 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:35:50 [Swigato Log]: User 'testuser1' (ID: 4) created and logged in successfully.
+2025-06-01 01:36:01 [Swigato Log]: User 'testuser1' logged out.
+2025-06-01 01:36:01 [Swigato Log]: Cart cleared.
+2025-06-01 01:36:01 [Swigato Log]: Logged out. Cart has been reset.
+2025-06-01 01:36:10 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:36:10 [Swigato Log]: User 'testuser1' (ID: 4) logged in successfully.
+2025-06-01 01:37:20 [Swigato Log]: User 'testuser1' logged out.
+2025-06-01 01:37:20 [Swigato Log]: Cart cleared.
+2025-06-01 01:37:20 [Swigato Log]: Logged out. Cart has been reset.
+2025-06-01 01:37:33 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:37:33 [Swigato Log]: Sign up failed: Username 'testuser1' already exists.
+2025-06-01 01:37:49 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:37:50 [Swigato Log]: Login failed for 'testuser1': Invalid username or password.
+2025-06-01 01:38:14 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:38:15 [Swigato Log]: Login failed for 'testuser1': Invalid username or password.
+2025-06-01 01:39:56 [Swigato Log]: App started
+2025-06-01 01:39:56 [Swigato Log]: Initializing database tables...
+2025-06-01 01:39:56 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:39:56 [Swigato Log]: Users table initialized.
+2025-06-01 01:39:56 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:39:56 [Swigato Log]: Restaurants table initialized.
+2025-06-01 01:39:56 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:39:56 [Swigato Log]: Menu items table initialized.
+2025-06-01 01:39:56 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:39:56 [Swigato Log]: Reviews table initialized.
+2025-06-01 01:39:56 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:39:56 [Swigato Log]: Orders table initialized.
+2025-06-01 01:39:56 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:39:56 [Swigato Log]: Order items table initialized.
+2025-06-01 01:39:56 [Swigato Log]: Database initialization complete.
+2025-06-01 01:39:56 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:39:56 [Swigato Log]: Admin user already exists. Skipping default admin creation.
+2025-06-01 01:39:56 [Swigato Log]: Initial data setup: Populating sample restaurant data.
+2025-06-01 01:39:56 [Swigato Log]: Attempting to populate sample restaurant data...
+2025-06-01 01:39:56 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:39:56 [Swigato Log]: Restaurant 'Paradise Biryani' already exists. Skipping.
+2025-06-01 01:39:56 [Swigato Log]: Restaurant 'Cafe Coffee Day' already exists. Skipping.
+2025-06-01 01:39:56 [Swigato Log]: Restaurant 'Punjabi Tadka' already exists. Skipping.
+2025-06-01 01:39:56 [Swigato Log]: Sample restaurant data population check complete.
+2025-06-01 01:39:56 [Swigato Log]: Initial data setup: Populating sample reviews.
+2025-06-01 01:39:56 [Swigato Log]: Attempting to populate sample review data...
+2025-06-01 01:39:56 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:39:56 [Swigato Log]: Sample user 'Alice' already exists with ID 2.
+2025-06-01 01:39:56 [Swigato Log]: Sample user 'Bob' already exists with ID 3.
+2025-06-01 01:39:56 [Swigato Log]: Sample review for 'Paradise Biryani' by 'Alice' (comment starting with 'Absolutely delicious...') already exists. Skipping.
+2025-06-01 01:39:56 [Swigato Log]: Sample review for 'Paradise Biryani' by 'Bob' (comment starting with 'Good biryani, but a ...') already exists. Skipping.
+2025-06-01 01:39:56 [Swigato Log]: Sample review for 'Cafe Coffee Day' by 'Alice' (comment starting with 'Coffee was okay, pla...') already exists. Skipping.
+2025-06-01 01:39:56 [Swigato Log]: Sample review for 'Punjabi Tadka' by 'Bob' (comment starting with 'Butter chicken was a...') already exists. Skipping.
+2025-06-01 01:39:56 [Swigato Log]: Sample review for 'Punjabi Tadka' by 'Alice' (comment starting with 'Great North Indian f...') already exists. Skipping.
+2025-06-01 01:39:56 [Swigato Log]: Sample review data population check complete.
+2025-06-01 01:40:07 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:40:08 [Swigato Log]: Login failed for 'testuser1': Invalid username or password.
+2025-06-01 01:40:37 [Swigato Log]: App started
+2025-06-01 01:40:37 [Swigato Log]: Initializing database tables...
+2025-06-01 01:40:37 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:40:37 [Swigato Log]: Users table initialized.
+2025-06-01 01:40:37 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:40:37 [Swigato Log]: Restaurants table initialized.
+2025-06-01 01:40:37 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:40:37 [Swigato Log]: Menu items table initialized.
+2025-06-01 01:40:37 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:40:37 [Swigato Log]: Reviews table initialized.
+2025-06-01 01:40:37 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:40:37 [Swigato Log]: Orders table initialized.
+2025-06-01 01:40:37 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:40:37 [Swigato Log]: Order items table initialized.
+2025-06-01 01:40:37 [Swigato Log]: Database initialization complete.
+2025-06-01 01:40:37 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:40:37 [Swigato Log]: Admin user already exists. Skipping default admin creation.
+2025-06-01 01:40:37 [Swigato Log]: Initial data setup: Populating sample restaurant data.
+2025-06-01 01:40:37 [Swigato Log]: Attempting to populate sample restaurant data...
+2025-06-01 01:40:37 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:40:37 [Swigato Log]: Restaurant 'Paradise Biryani' already exists. Skipping.
+2025-06-01 01:40:37 [Swigato Log]: Restaurant 'Cafe Coffee Day' already exists. Skipping.
+2025-06-01 01:40:37 [Swigato Log]: Restaurant 'Punjabi Tadka' already exists. Skipping.
+2025-06-01 01:40:37 [Swigato Log]: Sample restaurant data population check complete.
+2025-06-01 01:40:37 [Swigato Log]: Initial data setup: Populating sample reviews.
+2025-06-01 01:40:37 [Swigato Log]: Attempting to populate sample review data...
+2025-06-01 01:40:37 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:40:37 [Swigato Log]: Sample user 'Alice' already exists with ID 2.
+2025-06-01 01:40:37 [Swigato Log]: Sample user 'Bob' already exists with ID 3.
+2025-06-01 01:40:37 [Swigato Log]: Sample review for 'Paradise Biryani' by 'Alice' (comment starting with 'Absolutely delicious...') already exists. Skipping.
+2025-06-01 01:40:37 [Swigato Log]: Sample review for 'Paradise Biryani' by 'Bob' (comment starting with 'Good biryani, but a ...') already exists. Skipping.
+2025-06-01 01:40:37 [Swigato Log]: Sample review for 'Cafe Coffee Day' by 'Alice' (comment starting with 'Coffee was okay, pla...') already exists. Skipping.
+2025-06-01 01:40:37 [Swigato Log]: Sample review for 'Punjabi Tadka' by 'Bob' (comment starting with 'Butter chicken was a...') already exists. Skipping.
+2025-06-01 01:40:37 [Swigato Log]: Sample review for 'Punjabi Tadka' by 'Alice' (comment starting with 'Great North Indian f...') already exists. Skipping.
+2025-06-01 01:40:37 [Swigato Log]: Sample review data population check complete.
+2025-06-01 01:40:45 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:40:45 [Swigato Log]: User 'admin' (ID: 1) logged in successfully.
+2025-06-01 01:40:50 [Swigato Log]: User 'admin' logged out.
+2025-06-01 01:41:03 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:41:04 [Swigato Log]: User 'testuser1' (ID: 4) logged in successfully.
+2025-06-01 01:43:27 [Swigato Log]: App started
+2025-06-01 01:43:27 [Swigato Log]: Initializing database tables...
+2025-06-01 01:43:27 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:27 [Swigato Log]: Users table initialized.
+2025-06-01 01:43:27 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:27 [Swigato Log]: Restaurants table initialized.
+2025-06-01 01:43:27 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:27 [Swigato Log]: Menu items table initialized.
+2025-06-01 01:43:27 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:27 [Swigato Log]: Reviews table initialized.
+2025-06-01 01:43:27 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:27 [Swigato Log]: Orders table initialized.
+2025-06-01 01:43:27 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:27 [Swigato Log]: Order items table initialized.
+2025-06-01 01:43:27 [Swigato Log]: Database initialization complete.
+2025-06-01 01:43:27 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:27 [Swigato Log]: Admin user already exists. Skipping default admin creation.
+2025-06-01 01:43:27 [Swigato Log]: Initial data setup: Populating sample restaurant data.
+2025-06-01 01:43:27 [Swigato Log]: Attempting to populate sample restaurant data...
+2025-06-01 01:43:27 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:27 [Swigato Log]: Restaurant 'Paradise Biryani' already exists. Skipping.
+2025-06-01 01:43:27 [Swigato Log]: Restaurant 'Cafe Coffee Day' already exists. Skipping.
+2025-06-01 01:43:27 [Swigato Log]: Restaurant 'Punjabi Tadka' already exists. Skipping.
+2025-06-01 01:43:27 [Swigato Log]: Sample restaurant data population check complete.
+2025-06-01 01:43:27 [Swigato Log]: Initial data setup: Populating sample reviews.
+2025-06-01 01:43:27 [Swigato Log]: Attempting to populate sample review data...
+2025-06-01 01:43:27 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:27 [Swigato Log]: Sample user 'Alice' already exists with ID 2.
+2025-06-01 01:43:27 [Swigato Log]: Sample user 'Bob' already exists with ID 3.
+2025-06-01 01:43:27 [Swigato Log]: Sample review for 'Paradise Biryani' by 'Alice' (comment starting with 'Absolutely delicious...') already exists. Skipping.
+2025-06-01 01:43:27 [Swigato Log]: Sample review for 'Paradise Biryani' by 'Bob' (comment starting with 'Good biryani, but a ...') already exists. Skipping.
+2025-06-01 01:43:27 [Swigato Log]: Sample review for 'Cafe Coffee Day' by 'Alice' (comment starting with 'Coffee was okay, pla...') already exists. Skipping.
+2025-06-01 01:43:27 [Swigato Log]: Sample review for 'Punjabi Tadka' by 'Bob' (comment starting with 'Butter chicken was a...') already exists. Skipping.
+2025-06-01 01:43:27 [Swigato Log]: Sample review for 'Punjabi Tadka' by 'Alice' (comment starting with 'Great North Indian f...') already exists. Skipping.
+2025-06-01 01:43:27 [Swigato Log]: Sample review data population check complete.
+2025-06-01 01:43:35 [Swigato Log]: Fetching list of restaurants...
+2025-06-01 01:43:35 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:35 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:35 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:35 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:52 [Swigato Log]: Fetching list of restaurants...
+2025-06-01 01:43:52 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:52 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:52 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:43:52 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:48:00 [Swigato Log]: App started
+2025-06-01 01:48:00 [Swigato Log]: Initializing database tables...
+2025-06-01 01:48:00 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:48:00 [Swigato Log]: Users table initialized.
+2025-06-01 01:48:00 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:48:00 [Swigato Log]: Restaurants table initialized.
+2025-06-01 01:48:00 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:48:00 [Swigato Log]: Menu items table initialized.
+2025-06-01 01:48:00 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:48:00 [Swigato Log]: Reviews table initialized.
+2025-06-01 01:48:00 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:48:00 [Swigato Log]: Orders table initialized.
+2025-06-01 01:48:00 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:48:00 [Swigato Log]: Order items table initialized.
+2025-06-01 01:48:00 [Swigato Log]: Database initialization complete.
+2025-06-01 01:48:00 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:48:00 [Swigato Log]: Admin user already exists. Skipping default admin creation.
+2025-06-01 01:48:00 [Swigato Log]: Initial data setup: Populating sample restaurant data.
+2025-06-01 01:48:00 [Swigato Log]: Attempting to populate sample restaurant data...
+2025-06-01 01:48:00 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:48:00 [Swigato Log]: Restaurant 'Paradise Biryani' already exists. Skipping.
+2025-06-01 01:48:00 [Swigato Log]: Restaurant 'Cafe Coffee Day' already exists. Skipping.
+2025-06-01 01:48:00 [Swigato Log]: Restaurant 'Punjabi Tadka' already exists. Skipping.
+2025-06-01 01:48:00 [Swigato Log]: Sample restaurant data population check complete.
+2025-06-01 01:48:00 [Swigato Log]: Initial data setup: Populating sample reviews.
+2025-06-01 01:48:00 [Swigato Log]: Attempting to populate sample review data...
+2025-06-01 01:48:00 [Swigato Log]: Database connection established to g:\swigato_project\data\swigato.db
+2025-06-01 01:48:00 [Swigato Log]: Sample user 'Alice' already exists with ID 2.
+2025-06-01 01:48:00 [Swigato Log]: Sample user 'Bob' already exists with ID 3.
+2025-06-01 01:48:00 [Swigato Log]: Sample review for 'Paradise Biryani' by 'Alice' (comment starting with 'Absolutely delicious...') already exists. Skipping.
+2025-06-01 01:48:00 [Swigato Log]: Sample review for 'Paradise Biryani' by 'Bob' (comment starting with 'Good biryani, but a ...') already exists. Skipping.
+2025-06-01 01:48:00 [Swigato Log]: Sample review for 'Cafe Coffee Day' by 'Alice' (comment starting with 'Coffee was okay, pla...') already exists. Skipping.
+2025-06-01 01:48:00 [Swigato Log]: Sample review for 'Punjabi Tadka' by 'Bob' (comment starting with 'Butter chicken was a...') already exists. Skipping.
+2025-06-01 01:48:00 [Swigato Log]: Sample review for 'Punjabi Tadka' by 'Alice' (comment starting with 'Great North Indian f...') already exists. Skipping.
+2025-06-01 01:48:00 [Swigato Log]: Sample review data population check complete.
