@@ -1,12 +1,20 @@
 .venv/
 
+# OS-generated files
+# Ignore macOS .DS_Store files
+.DS_Store
+# Ignore Windows thumbnail cache files
+Thumbs.db
+# Ignore Windows folder customization files
+Desktop.ini
+
 # Python bytecode files
 __pycache__/
 *.py[cod]
 # Distribution / packaging
 .Python
-build/
 dist/
+*.egg-info/
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
@@ -28,7 +36,6 @@ docs/_build/
 #  option.
 #  See https://pyinstaller.readthedocs.io/en/stable/usage.html#options
 #  for more information.
-build/
 # Pyre type checker
 .pyre/
 # mypy
@@ -56,4 +63,4 @@ coverage.xml
 
 # database files
 *.sqlite3
-.db
+*.db

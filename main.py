@@ -154,8 +154,8 @@ def handle_menu_actions(restaurant):
         console.print()  # Added line break
         action = get_validated_input(
             prompt=f"Menu for [bold]{restaurant.name}[/bold] - Enter item ID to add, 'v' to view cart, or 'b'/'0' to go back: ",
-            validation_type="custom",  # Using custom validation
-            error_message="Invalid input. Please enter a valid item ID, 'v', 'b', or '0'.",
+            validation_type="regex",  # Changed from "custom" to "regex"
+            custom_error_message="Invalid input. Please enter a valid item ID, 'v', 'b', or '0'.", # Changed error_message to custom_error_message
             options={"pattern": r"^(v|b|0|[1-9][0-9]*)$"}  # Regex for v, b, 0, or positive integer
         ).lower()
 
@@ -172,7 +172,7 @@ def handle_menu_actions(restaurant):
                     prompt="Proceed to checkout? (yes/no): ",
                     validation_type="yes_no"
                 )
-                if checkout_choice == 'yes':  # Changed from `in ['yes', 'y']`
+                if checkout_choice in ['yes', 'y']:  # Corrected this line
                     handle_checkout()
         elif action.isdigit() and action in valid_item_ids:
             selected_item = next((item for item in restaurant.menu if str(item.item_id) == action), None)
