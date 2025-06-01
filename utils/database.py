@@ -57,6 +57,7 @@ def init_restaurants_table():
             name TEXT NOT NULL,
             cuisine_type TEXT,
             address TEXT,
+            image_filename TEXT, -- Added image_filename column
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -76,6 +77,7 @@ def init_menu_items_table():
             description TEXT,
             price REAL NOT NULL,
             category TEXT,
+            image_filename TEXT, -- Added image_filename column
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (restaurant_id) REFERENCES restaurants (restaurant_id)
         )

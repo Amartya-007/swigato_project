@@ -1,320 +1,199 @@
 import customtkinter as ctk
-from PIL import Image  # For handling images
-import os  # To construct absolute paths for images
+import os
+import json
+from tkinter import messagebox
 
-# Color Palette
-PRIMARY_COLOR = "#FF6347"  # Tomato Red
-BACKGROUND_COLOR = "#2C3E50"  # Midnight Blue
-ENTRY_BG_COLOR = "#34495E"  # Slightly Lighter Blue
-TEXT_COLOR = "#ECF0F1"  # Light Gray/Off-White
-BUTTON_HOVER_COLOR = "#FF7F50"  # Coral (for hover effect)
-SUCCESS_COLOR = "#2ECC71"  # Emerald Green
-DISABLED_BUTTON_COLOR = "#566573"  # A darker gray for disabled state
+# Import constants
+from gui_constants import BACKGROUND_COLOR, TEXT_COLOR, PRIMARY_COLOR, BUTTON_HOVER_COLOR, SUCCESS_COLOR, DISABLED_BUTTON_COLOR
 
+# Import screen components
+from gui_components.login_screen import LoginScreen
+from gui_components.signup_screen import SignupScreen
+from gui_components.main_app_screen import MainAppScreen
+from gui_components.menu_screen import MenuScreen
+from gui_components.cart_screen import CartScreen
+from cart.models import Cart
+from users.auth import User
 
-class LoginScreen(ctk.CTkFrame):
-    def __init__(self, master):
-        super().__init__(master, fg_color=BACKGROUND_COLOR)
-        self.master = master
-        self.password_visible = False  # State for password visibility
-
-        # Load Swigato image
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(current_dir, "swigato_icon.png")
-        try:
-            self.swigato_image = ctk.CTkImage(light_image=Image.open(image_path), size=(100, 100))  # Adjust size as needed
-            self.swigato_image_label = ctk.CTkLabel(self, image=self.swigato_image, text="")
-            self.swigato_image_label.grid(row=1, column=0, pady=(20, 5), sticky="s")
-        except Exception as e:
-            print(f"Error loading Swigato icon: {e}")
-            self.swigato_image_label = ctk.CTkLabel(self, text="Swigato", text_color=PRIMARY_COLOR, font=ctk.CTkFont(size=36, weight="bold"))
-            self.swigato_image_label.grid(row=1, column=0, pady=(20, 10), sticky="s")
-
-        # Main frame grid configuration
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)  # Top spacer
-        self.grid_rowconfigure(1, weight=0)  # Swigato Image/Title
-        self.grid_rowconfigure(2, weight=0)  # Form Frame
-        self.grid_rowconfigure(3, weight=0)  # Signup Link
-        self.grid_rowconfigure(4, weight=1)  # Bottom spacer
-
-        # Frame for login form elements
-        form_frame = ctk.CTkFrame(self, fg_color="transparent")
-        form_frame.grid(row=2, column=0, padx=50, pady=(5, 20), sticky="nwe")  # Adjusted pady
-        form_frame.grid_columnconfigure(0, weight=1)
-
-        # Header within the form frame
-        header_label = ctk.CTkLabel(form_frame, text="Welcome Back!", text_color=TEXT_COLOR, font=ctk.CTkFont(size=24, weight="bold"))
-        header_label.grid(row=0, column=0, columnspan=2, pady=(0, 20), sticky="n")
-
-        # Username
-        username_label = ctk.CTkLabel(form_frame, text="Username or Email:", text_color=TEXT_COLOR, font=ctk.CTkFont(size=14))
-        username_label.grid(row=1, column=0, columnspan=2, pady=(0, 0), sticky="sw")
-        self.username_entry = ctk.CTkEntry(form_frame, width=300, height=40, fg_color=ENTRY_BG_COLOR, text_color=TEXT_COLOR,
-                                           border_color=PRIMARY_COLOR, corner_radius=5, placeholder_text="Enter your username or email")
-        self.username_entry.grid(row=2, column=0, columnspan=2, pady=(0, 10), sticky="nwe")
-        self.username_entry.bind("<Return>", self.login_event)
-        self.username_entry.focus()  # Set initial focus
-
-        # Password
-        password_label = ctk.CTkLabel(form_frame, text="Password:", text_color=TEXT_COLOR, font=ctk.CTkFont(size=14))
-        password_label.grid(row=3, column=0, columnspan=2, pady=(5, 0), sticky="sw")
-
-        password_input_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
-        password_input_frame.grid(row=4, column=0, columnspan=2, pady=(0, 10), sticky="nwe")
-        password_input_frame.grid_columnconfigure(0, weight=1)
-        password_input_frame.grid_columnconfigure(1, weight=0)
-
-        self.password_entry = ctk.CTkEntry(password_input_frame, width=250, height=40, fg_color=ENTRY_BG_COLOR, text_color=TEXT_COLOR,
-                                           border_color=PRIMARY_COLOR, show="*", corner_radius=5, placeholder_text="Enter your password")
-        self.password_entry.grid(row=0, column=0, sticky="nwe")
-        self.password_entry.bind("<Return>", self.login_event)
-
-        self.toggle_password_button = ctk.CTkButton(password_input_frame, text="Show", width=40, height=40,
-                                                    fg_color=ENTRY_BG_COLOR, text_color=TEXT_COLOR, hover_color=PRIMARY_COLOR,
-                                                    command=self.toggle_password_visibility)
-        self.toggle_password_button.grid(row=0, column=1, padx=(5, 0), sticky="nwe")
-
-        # Remember Me Checkbox
-        self.remember_me_checkbox = ctk.CTkCheckBox(form_frame, text="Remember Me", text_color=TEXT_COLOR,
-                                                    fg_color=PRIMARY_COLOR, hover_color=BUTTON_HOVER_COLOR,
-                                                    border_color=PRIMARY_COLOR)
-        self.remember_me_checkbox.grid(row=5, column=0, columnspan=2, pady=(0, 15), sticky="w")
-
-        # Login Button
-        self.login_button = ctk.CTkButton(form_frame, text="Login", command=self.login_event, width=300, height=40,
-                                          fg_color=PRIMARY_COLOR, text_color=TEXT_COLOR, hover_color=BUTTON_HOVER_COLOR,
-                                          font=ctk.CTkFont(size=16, weight="bold"), corner_radius=5)
-        self.login_button.grid(row=6, column=0, columnspan=2, pady=10, sticky="nwe")
-
-        # Status Label
-        self.status_label = ctk.CTkLabel(form_frame, text="", font=ctk.CTkFont(size=12))  # Color set dynamically
-        self.status_label.grid(row=7, column=0, columnspan=2, pady=(0, 10), sticky="nwe")
-
-        # Sign Up Link
-        signup_button = ctk.CTkButton(self, text="Don't have an account? Sign Up", fg_color="transparent",
-                                      text_color=PRIMARY_COLOR, hover_color=BACKGROUND_COLOR,
-                                      command=self.go_to_signup, font=ctk.CTkFont(size=12, underline=True))
-        signup_button.grid(row=3, column=0, pady=(5, 20), sticky="n")
-
-    def toggle_password_visibility(self):
-        if self.password_visible:
-            self.password_entry.configure(show="*")
-            self.toggle_password_button.configure(text="Show")
-            self.password_visible = False
-        else:
-            self.password_entry.configure(show="")
-            self.toggle_password_button.configure(text="Hide")
-            self.password_visible = True
-
-    def login_event(self, event=None):
-        self.status_label.configure(text="")  # Clear previous status
-        original_button_text = "Login"
-        self.login_button.configure(state="disabled", text="Logging in...", fg_color=DISABLED_BUTTON_COLOR)
-
-        username = self.username_entry.get()
-        password = self.password_entry.get()
-        remember_me = self.remember_me_checkbox.get()
-
-        print(f"Login attempt: Username: {username}, Password: {password}, Remember Me: {remember_me}")
-
-        def process_login_attempt():
-            if not username or not password:
-                self.status_label.configure(text="Username and Password are required.", text_color=PRIMARY_COLOR)
-            else:
-                self.status_label.configure(text="Login: Placeholder success!", text_color=SUCCESS_COLOR)
-            self.login_button.configure(state="normal", text=original_button_text, fg_color=PRIMARY_COLOR)
-
-        self.after(500, process_login_attempt)  # Simulate network delay
-
-    def go_to_signup(self):
-        self.master.show_signup_screen()
-
-
-class SignupScreen(ctk.CTkFrame):
-    def __init__(self, master):
-        super().__init__(master, fg_color=BACKGROUND_COLOR)
-        self.master = master
-        self.password_visible = False
-        self.confirm_password_visible = False
-
-        # Load Swigato image
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(current_dir, "swigato_icon.png")
-        try:
-            self.swigato_image = ctk.CTkImage(light_image=Image.open(image_path), size=(100, 100))  # Adjust size as needed
-            self.swigato_image_label = ctk.CTkLabel(self, image=self.swigato_image, text="")
-            self.swigato_image_label.grid(row=1, column=0, pady=(20, 5), sticky="s")
-        except Exception as e:
-            print(f"Error loading Swigato icon: {e}")
-            self.swigato_image_label = ctk.CTkLabel(self, text="Swigato", text_color=PRIMARY_COLOR, font=ctk.CTkFont(size=36, weight="bold"))
-            self.swigato_image_label.grid(row=1, column=0, pady=(20, 10), sticky="s")
-
-        # Main frame grid configuration
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)  # Top spacer
-        self.grid_rowconfigure(1, weight=0)  # Swigato Image/Title
-        self.grid_rowconfigure(2, weight=0)  # Form Frame
-        self.grid_rowconfigure(3, weight=0)  # Login Link
-        self.grid_rowconfigure(4, weight=1)  # Bottom spacer
-
-        form_frame = ctk.CTkFrame(self, fg_color="transparent")
-        form_frame.grid(row=2, column=0, padx=50, pady=(5, 10), sticky="nwe")  # Adjusted pady
-        form_frame.grid_columnconfigure(0, weight=1)
-
-        header_label = ctk.CTkLabel(form_frame, text="Create Your Account", text_color=TEXT_COLOR,
-                                    font=ctk.CTkFont(size=24, weight="bold"))
-        header_label.grid(row=0, column=0, columnspan=2, pady=(0, 15), sticky="n")
-
-        username_label = ctk.CTkLabel(form_frame, text="Username:", text_color=TEXT_COLOR, font=ctk.CTkFont(size=14))
-        username_label.grid(row=1, column=0, columnspan=2, pady=(5, 0), sticky="sw")
-        self.username_entry = ctk.CTkEntry(form_frame, width=300, height=40, fg_color=ENTRY_BG_COLOR, text_color=TEXT_COLOR,
-                                           border_color=PRIMARY_COLOR, corner_radius=5, placeholder_text="Choose a username")
-        self.username_entry.grid(row=2, column=0, columnspan=2, pady=(0, 10), sticky="nwe")
-        self.username_entry.bind("<Return>", self.signup_event)
-        self.username_entry.focus()  # Set initial focus
-
-        email_label = ctk.CTkLabel(form_frame, text="Email:", text_color=TEXT_COLOR, font=ctk.CTkFont(size=14))
-        email_label.grid(row=3, column=0, columnspan=2, pady=(5, 0), sticky="sw")
-        self.email_entry = ctk.CTkEntry(form_frame, width=300, height=40, fg_color=ENTRY_BG_COLOR, text_color=TEXT_COLOR,
-                                        border_color=PRIMARY_COLOR, corner_radius=5, placeholder_text="Enter your email address")
-        self.email_entry.grid(row=4, column=0, columnspan=2, pady=(0, 10), sticky="nwe")
-        self.email_entry.bind("<Return>", self.signup_event)
-
-        # Password Frame
-        password_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
-        password_frame.grid(row=5, column=0, columnspan=2, sticky="nwe")
-        password_frame.grid_columnconfigure(0, weight=1)
-        password_frame.grid_columnconfigure(1, weight=0)
-
-        password_label = ctk.CTkLabel(password_frame, text="Password:", text_color=TEXT_COLOR, font=ctk.CTkFont(size=14))
-        password_label.grid(row=0, column=0, columnspan=2, pady=(5, 0), sticky="sw")
-        self.password_entry = ctk.CTkEntry(password_frame, width=250, height=40, fg_color=ENTRY_BG_COLOR, text_color=TEXT_COLOR,
-                                           border_color=PRIMARY_COLOR, show="*", corner_radius=5, placeholder_text="Create a password")
-        self.password_entry.grid(row=1, column=0, pady=(0, 10), sticky="nwe")
-        self.password_entry.bind("<Return>", self.signup_event)
-        self.toggle_pass_btn = ctk.CTkButton(password_frame, text="Show", width=40, height=40,
-                                             command=lambda: self.toggle_visibility(self.password_entry, self.toggle_pass_btn, "password_visible"),
-                                             fg_color=ENTRY_BG_COLOR, text_color=TEXT_COLOR, hover_color=PRIMARY_COLOR)
-        self.toggle_pass_btn.grid(row=1, column=1, padx=(5, 0), pady=(0, 10), sticky="nwe")
-
-        # Confirm Password Frame
-        confirm_password_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
-        confirm_password_frame.grid(row=6, column=0, columnspan=2, sticky="nwe")
-        confirm_password_frame.grid_columnconfigure(0, weight=1)
-        confirm_password_frame.grid_columnconfigure(1, weight=0)
-
-        confirm_password_label = ctk.CTkLabel(confirm_password_frame, text="Confirm Password:", text_color=TEXT_COLOR,
-                                              font=ctk.CTkFont(size=14))
-        confirm_password_label.grid(row=0, column=0, columnspan=2, pady=(5, 0), sticky="sw")
-        self.confirm_password_entry = ctk.CTkEntry(confirm_password_frame, width=250, height=40, fg_color=ENTRY_BG_COLOR,
-                                                   text_color=TEXT_COLOR, border_color=PRIMARY_COLOR, show="*",
-                                                   corner_radius=5, placeholder_text="Confirm your password")
-        self.confirm_password_entry.grid(row=1, column=0, pady=(0, 20), sticky="nwe")
-        self.confirm_password_entry.bind("<Return>", self.signup_event)
-        self.toggle_confirm_pass_btn = ctk.CTkButton(confirm_password_frame, text="Show", width=40, height=40,
-                                                     command=lambda: self.toggle_visibility(self.confirm_password_entry, self.toggle_confirm_pass_btn, "confirm_password_visible"),
-                                                     fg_color=ENTRY_BG_COLOR, text_color=TEXT_COLOR, hover_color=PRIMARY_COLOR)
-        self.toggle_confirm_pass_btn.grid(row=1, column=1, padx=(5, 0), pady=(0, 20), sticky="nwe")
-
-        self.signup_button = ctk.CTkButton(form_frame, text="Sign Up", command=self.signup_event, width=300, height=40,
-                                           fg_color=PRIMARY_COLOR, text_color=TEXT_COLOR, hover_color=BUTTON_HOVER_COLOR,
-                                           font=ctk.CTkFont(size=16, weight="bold"), corner_radius=5)
-        self.signup_button.grid(row=7, column=0, columnspan=2, pady=10, sticky="nwe")
-
-        self.status_label = ctk.CTkLabel(form_frame, text="", font=ctk.CTkFont(size=12))  # Color set dynamically
-        self.status_label.grid(row=8, column=0, columnspan=2, pady=(0, 10), sticky="nwe")
-
-        login_link_button = ctk.CTkButton(self, text="Already have an account? Login", fg_color="transparent",
-                                          text_color=PRIMARY_COLOR, hover_color=BACKGROUND_COLOR,
-                                          command=self.go_to_login, font=ctk.CTkFont(size=12, underline=True))
-        login_link_button.grid(row=3, column=0, pady=(5, 20), sticky="n")
-
-    def toggle_visibility(self, entry_widget, button_widget, visibility_attr_name):
-        visibility_attr = getattr(self, visibility_attr_name)
-        if visibility_attr:
-            entry_widget.configure(show="*")
-            button_widget.configure(text="Show")
-            setattr(self, visibility_attr_name, False)
-        else:
-            entry_widget.configure(show="")
-            button_widget.configure(text="Hide")
-            setattr(self, visibility_attr_name, True)
-
-    def signup_event(self, event=None):
-        self.status_label.configure(text="")  # Clear previous status
-        original_button_text = "Sign Up"
-        self.signup_button.configure(state="disabled", text="Signing up...", fg_color=DISABLED_BUTTON_COLOR)
-
-        username = self.username_entry.get()
-        email = self.email_entry.get()
-        password = self.password_entry.get()
-        confirm_password = self.confirm_password_entry.get()
-
-        print(f"Signup attempt: User: {username}, Email: {email}, Pass: {password}, Confirm: {confirm_password}")
-
-        def process_signup_attempt():
-            if not all([username, email, password, confirm_password]):
-                self.status_label.configure(text="All fields are required.", text_color=PRIMARY_COLOR)
-            elif ".com" not in email or "@" not in email:
-                self.status_label.configure(text="Invalid email format.", text_color=PRIMARY_COLOR)
-            elif len(password) < 6:
-                self.status_label.configure(text="Password must be at least 6 characters.", text_color=PRIMARY_COLOR)
-            elif password != confirm_password:
-                self.status_label.configure(text="Passwords do not match.", text_color=PRIMARY_COLOR)
-            else:
-                self.status_label.configure(text="Signup: Placeholder success!", text_color=SUCCESS_COLOR)
-            self.signup_button.configure(state="normal", text=original_button_text, fg_color=PRIMARY_COLOR)
-
-        self.after(500, process_signup_attempt)  # Simulate network/processing delay
-
-    def go_to_login(self):
-        self.master.show_login_screen()
+# Import for DB setup
+from utils.database import initialize_database
+from restaurants.models import populate_sample_restaurant_data
 
 
 class App(ctk.CTk):
     def __init__(self):
-        super().__init__(fg_color=BACKGROUND_COLOR)
+        super().__init__()
 
-        self.title("Swigato - Food Delivery")
-        self.geometry("500x700")  # Increased height slightly for image
+        self.title("Swigato Food Delivery")
+
+        # Define project_root early
+        self.project_root = os.path.dirname(os.path.abspath(__file__))
+
         ctk.set_appearance_mode("Dark")
 
         # Set window icon
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        icon_path = os.path.join(current_dir, "swigato_icon.ico")  # Changed to .ico
+        icon_path = os.path.join(self.project_root, "swigato_icon.ico")  # Use self.project_root
         try:
-            self.iconbitmap(icon_path)  # For Windows
+            self.iconbitmap(icon_path)
         except Exception as e:
             print(f"Error setting window icon: {e}")
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        self.login_screen = None
-        self.signup_screen = None
+        self.current_user: User | None = None
+        self.current_restaurant = None
+        self.cart: Cart | None = None
+
+        self.current_screen_frame = None
+
+        # Initialize database and populate sample data
+        initialize_database()
+        populate_sample_restaurant_data()
 
         self.show_login_screen()
 
-    def show_login_screen(self):
-        if self.signup_screen:
-            self.signup_screen.grid_forget()
-            self.signup_screen.destroy()
-            self.signup_screen = None
+    def _center_window(self, width, height):
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x_cordinate = int((screen_width / 2) - (width / 2))
+        y_cordinate = int((screen_height / 2) - (height / 2))
+        self.geometry(f"{width}x{height}+{x_cordinate}+{y_cordinate}")
 
-        if not self.login_screen:
-            self.login_screen = LoginScreen(self)
-        self.login_screen.grid(row=0, column=0, sticky="nsew")
+    def _set_window_properties(self, title, width, height):
+        self.title(title)
+        self._center_window(width, height)
+
+    def _create_login_screen(self):
+        return LoginScreen(self, self.show_signup_screen, self.show_main_app_screen)
+
+    def _create_signup_screen(self):
+        return SignupScreen(self, self.show_login_screen)
+
+    def _create_main_app_screen(self):
+        return MainAppScreen(self, self.current_user, self.show_menu_screen, self.show_cart_screen, self.logout)
+
+    def _create_menu_screen(self, restaurant):
+        return MenuScreen(self, self.current_user, restaurant, self.show_cart_screen)
+
+    def _create_cart_screen(self):
+        self.cart_screen_instance = CartScreen(
+            self, 
+            self.current_user, 
+            self.cart, 
+            self.show_main_app_screen,  # Callback for general fallback/main screen
+            self.show_menu_screen,      # Callback for "Back to Menu"
+            self.handle_checkout        # Callback for "Proceed to Checkout"
+        )
+        return self.cart_screen_instance
+
+    def _switch_screen(self, screen_factory_method, *factory_args, title, width, height):
+        if self.current_screen_frame:
+            self.current_screen_frame.destroy()
+            self.current_screen_frame = None
+
+        self.current_screen_frame = screen_factory_method(*factory_args)
+        self.current_screen_frame.pack(fill="both", expand=True)
+        self._set_window_properties(title, width, height)
+
+    def show_login_screen(self, username=None):
+        self.current_user = None
+        self.current_restaurant = None
+        self.cart = None
+
+        self._switch_screen(self._create_login_screen, title="Swigato - Login", width=400, height=550)
+
+        if username:
+            self.current_screen_frame.username_entry.delete(0, 'end')
+            self.current_screen_frame.username_entry.insert(0, username)
+            self.current_screen_frame.password_entry.focus_set()
+        else:
+            if not self.current_screen_frame.username_entry.get():
+                self.current_screen_frame.username_entry.focus_set()
+            else:
+                self.current_screen_frame.password_entry.focus_set()
 
     def show_signup_screen(self):
-        if self.login_screen:
-            self.login_screen.grid_forget()
-            self.login_screen.destroy()
-            self.login_screen = None
+        self._switch_screen(self._create_signup_screen, title="Swigato - Sign Up", width=400, height=600)
 
-        if not self.signup_screen:
-            self.signup_screen = SignupScreen(self)
-        self.signup_screen.grid(row=0, column=0, sticky="nsew")
+    def show_main_app_screen(self, user: User):
+        self.current_user = user
+        self.cart = Cart(user_id=user.username if user else None)
+
+        self._switch_screen(self._create_main_app_screen, title="Swigato - Home", width=900, height=700)
+
+    def show_menu_screen(self, restaurant):
+        if not self.current_user:
+            print("Error: User not logged in. Cannot show menu.")
+            self.show_login_screen()
+            return
+        self.current_restaurant = restaurant
+        self._switch_screen(self._create_menu_screen, restaurant, title=f"Swigato - {restaurant.name}", width=900, height=700)
+        # self.current_screen_frame is now the menu_screen_instance
+        if self.current_screen_frame and hasattr(self.current_screen_frame, 'load_menu_items'):
+            self.current_screen_frame.load_menu_items()
+
+    def show_menu_screen_from_cart(self, restaurant):
+        self.show_menu_screen(restaurant)
+
+    def show_cart_screen(self):
+        if not self.current_user:  # Check current_user first
+            print("Error: User not logged in. Cannot show cart.")
+            self.show_login_screen()
+            return
+        if not self.cart:  # Then check cart
+            print("Error: Cart not initialized. Cannot show cart.")
+            self.show_main_app_screen()  # Or some other appropriate screen
+            return
+
+        self._switch_screen(self._create_cart_screen, title=f"Swigato - {self.current_user.username}'s Cart", width=800, height=600)
+        # self.current_screen_frame is now the cart_screen_instance
+        if self.current_screen_frame and hasattr(self.current_screen_frame, 'load_cart_items'):
+            self.current_screen_frame.load_cart_items()
+
+    def handle_checkout(self):
+        if self.cart and self.cart.items:
+            print(f"Checkout initiated for user {self.current_user.username} with items: {self.cart.items}")
+            
+            # Actual order processing would happen here (e.g., save to DB)
+            # For now, we just clear the cart.
+            self.cart.items.clear()
+            
+            # If the current screen is CartScreen, update it to show it's empty before navigating
+            if self.current_screen_frame and isinstance(self.current_screen_frame, CartScreen):
+                 self.current_screen_frame.load_cart_items() # Update to show empty cart
+
+            # Show a success message dialog
+            try:
+                messagebox.showinfo("Checkout Successful", "Your order has been placed!")
+            except Exception as e:
+                print(f"Error showing checkout messagebox: {e}")
+
+            self.show_main_app_screen(self.current_user) # Go back to main screen
+        else:
+            print("Checkout attempt with empty cart.")
+            if self.current_screen_frame and isinstance(self.current_screen_frame, CartScreen):
+                try:
+                    messagebox.showwarning("Empty Cart", "Your cart is empty. Please add items before checking out.")
+                except Exception as e:
+                    print(f"Error showing empty cart messagebox: {e}")
+
+    def logout(self):
+        self.current_user = None
+        self.current_restaurant = None
+        if self.cart:
+            self.cart.items = {}
+            self.cart = None
+
+        remember_me_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "remember_me.json")
+        if os.path.exists(remember_me_file_path):
+            try:
+                with open(remember_me_file_path, 'w') as f:
+                    json.dump({}, f)
+            except Exception as e:
+                print(f"Error clearing remember_me.json on logout: {e}")
+
+        self.show_login_screen()
 
 
 if __name__ == "__main__":

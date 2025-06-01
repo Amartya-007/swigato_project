@@ -1,3 +1,4 @@
+import uuid # Added import
 from utils.logger import log
 from rich.table import Table
 from rich.text import Text
@@ -16,6 +17,7 @@ class CartItem:
 
 class Cart:
     def __init__(self, user_id=None): # user_id can be None for guest carts
+        self.cart_id = str(uuid.uuid4()) # Added cart_id
         self.user_id = user_id
         self.items = {} # Using a dictionary for easier quantity updates: {item_id: CartItem}
 
