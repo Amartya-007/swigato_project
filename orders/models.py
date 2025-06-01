@@ -142,7 +142,8 @@ def create_order(user_id, restaurant_id, restaurant_name, cart_items, total_amou
         log(f"Order {order_id} created in DB. Adding items...")
 
         created_order_items = []
-        for cart_item_obj in cart_items.values(): # Assuming cart_items is the cart.items dictionary
+        # cart_items is now expected to be a list of CartItem objects
+        for cart_item_obj in cart_items: 
             cursor.execute("""
                 INSERT INTO order_items (order_id, item_id, name, price, quantity)
                 VALUES (?, ?, ?, ?, ?)

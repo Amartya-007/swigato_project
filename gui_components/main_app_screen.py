@@ -24,6 +24,7 @@ class MainAppScreen(ctk.CTkFrame):
         header_frame.grid_columnconfigure(0, weight=1) # Welcome message
         header_frame.grid_columnconfigure(1, weight=0) # View Cart button
         header_frame.grid_columnconfigure(2, weight=0) # Logout button
+        header_frame.grid_columnconfigure(3, weight=0) # Admin Panel button (if admin)
 
         welcome_text = f"Welcome, {self.user.username}!"
         self.welcome_label = ctk.CTkLabel(header_frame, text=welcome_text,
@@ -39,13 +40,29 @@ class MainAppScreen(ctk.CTkFrame):
                                          font=ctk.CTkFont(weight="bold"))
         view_cart_button.grid(row=0, column=1, padx=(0,10), sticky="e")
 
+        # Add Admin Panel button if user is admin
+        if hasattr(self.user, "is_admin") and self.user.is_admin:
+            admin_panel_button = ctk.CTkButton(
+                header_frame,
+                text="Admin Panel",
+                command=lambda: self.app_ref.show_admin_screen(self.user),
+                fg_color=SECONDARY_COLOR,
+                hover_color=BUTTON_HOVER_COLOR,
+                text_color=TEXT_COLOR,
+                font=ctk.CTkFont(weight="bold")
+            )
+            admin_panel_button.grid(row=0, column=2, padx=(0,10), sticky="e")
+            logout_col = 3
+        else:
+            logout_col = 2
+
         logout_button = ctk.CTkButton(header_frame, text="Logout",
                                       command=self.logout_callback,
                                       fg_color="#D32F2F",  # Red color for logout
                                       hover_color="#B71C1C",
                                       text_color=TEXT_COLOR,
                                       font=ctk.CTkFont(weight="bold"))
-        logout_button.grid(row=0, column=2, sticky="e")
+        logout_button.grid(row=0, column=logout_col, sticky="e")
 
         # --- Restaurant List Scrollable Frame ---
         self.restaurant_scroll_frame = ctk.CTkScrollableFrame(self, fg_color=BACKGROUND_COLOR, border_width=0)

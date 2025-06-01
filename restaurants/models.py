@@ -162,11 +162,13 @@ class MenuItem:
             conn.close()
 
 class Restaurant:
-    def __init__(self, restaurant_id, name, cuisine_type, address, image_filename=None, created_at=None):
+    def __init__(self, restaurant_id, name, cuisine_type, address, description=None, image_filename=None, created_at=None):
         self.restaurant_id = restaurant_id
+        self.id = restaurant_id  # Add alias for compatibility if needed, or update all usages
         self.name = name
         self.cuisine_type = cuisine_type
         self.address = address
+        self.description = description
         self.image_filename = image_filename
         self.created_at = created_at
 
@@ -261,8 +263,8 @@ class Restaurant:
             )
         console.print(table)
 
-    def update(self, name=None, cuisine_type=None, address=None, image_filename=None):
-        if not any([name, cuisine_type, address, image_filename]):
+    def update(self, name=None, cuisine_type=None, address=None, description=None, image_filename=None):
+        if not any([name, cuisine_type, address, description, image_filename]):
             log("No update parameters provided for restaurant.")
             return False
 
@@ -280,6 +282,9 @@ class Restaurant:
         if address:
             fields_to_update.append("address = ?")
             parameters.append(address)
+        if description:
+            fields_to_update.append("description = ?")
+            parameters.append(description)
         if image_filename:
             fields_to_update.append("image_filename = ?")
             parameters.append(image_filename)
@@ -294,12 +299,13 @@ class Restaurant:
             if name: self.name = name
             if cuisine_type: self.cuisine_type = cuisine_type
             if address: self.address = address
+            if description: self.description = description
             if image_filename: self.image_filename = image_filename
             return True
         except sqlite3.Error as e:
             log(f"SQLite error updating restaurant ID {self.restaurant_id}: {e}")
-            if "no such column: image_filename" in str(e).lower():
-                log("Hint: The 'image_filename' column might be missing.")
+            if "no such column: image_filename" in str(e).lower() or "no such column: description" in str(e).lower():
+                log("Hint: The 'image_filename' or 'description' column might be missing.")
             conn.rollback()
             return False
         except Exception as e:
@@ -331,22 +337,22 @@ class Restaurant:
             conn.close()
 
     @staticmethod
-    def create(name, cuisine_type, address, image_filename=None):
+    def create(name, cuisine_type, address, description=None, image_filename=None):
         conn = get_db_connection()
         cursor = conn.cursor()
         try:
             cursor.execute("""
-                INSERT INTO restaurants (name, cuisine_type, address, image_filename)
-                VALUES (?, ?, ?, ?)
-            """, (name, cuisine_type, address, image_filename))
+                INSERT INTO restaurants (name, cuisine_type, address, description, image_filename)
+                VALUES (?, ?, ?, ?, ?)
+            """, (name, cuisine_type, address, description, image_filename))
             conn.commit()
             restaurant_id = cursor.lastrowid
-            log(f"Restaurant '{name}' created with ID {restaurant_id}, image: {image_filename}.")
+            log(f"Restaurant '{name}' created with ID {restaurant_id}, description: {description}, image: {image_filename}.")
             return Restaurant.get_by_id(restaurant_id)
         except sqlite3.Error as e:
             log(f"SQLite error creating restaurant '{name}': {e}")
-            if "no such column: image_filename" in str(e).lower():
-                log("Hint: The 'image_filename' column might be missing in the 'restaurants' table. Consider adding it: ALTER TABLE restaurants ADD COLUMN image_filename TEXT;")
+            if "no such column: description" in str(e).lower() or "no such column: image_filename" in str(e).lower():
+                log("Hint: The 'description' or 'image_filename' column might be missing in the 'restaurants' table.")
             conn.rollback()
             return None
         except Exception as e:
@@ -369,8 +375,8 @@ class Restaurant:
             return None
         except sqlite3.Error as e:
             log(f"SQLite error fetching restaurant ID {restaurant_id}: {e}")
-            if "no such column: image_filename" in str(e).lower():
-                log("Hint: The 'image_filename' column might be missing.")
+            if "no such column: image_filename" in str(e).lower() or "no such column: description" in str(e).lower():
+                log("Hint: The 'image_filename' or 'description' column might be missing.")
             return None
         except Exception as e:
             log(f"Error fetching restaurant ID {restaurant_id}: {e}")
@@ -392,8 +398,8 @@ class Restaurant:
             return restaurants
         except sqlite3.Error as e:
             log(f"SQLite error fetching all restaurants: {e}")
-            if "no such column: image_filename" in str(e).lower():
-                log("Hint: The 'image_filename' column might be missing.")
+            if "no such column: image_filename" in str(e).lower() or "no such column: description" in str(e).lower():
+                log("Hint: The 'image_filename' or 'description' column might be missing.")
             return []
         except Exception as e:
             log(f"Error fetching all restaurants: {e}")
@@ -405,7 +411,7 @@ def populate_sample_restaurant_data():
     log("Attempting to populate sample restaurant data...")
     
     restaurants_to_add = [
-        {"name": "Paradise Biryani", "cuisine": "Hyderabadi", "address": "Secunderabad, Hyderabad", "image_filename": "restaurent_a.jpeg", "menu": [
+        {"name": "Paradise Biryani", "cuisine": "Hyderabadi", "address": "Secunderabad, Hyderabad", "description": "Famous for authentic Hyderabadi biryani.", "image_filename": "restaurent_a.jpeg", "menu": [
             {"name": "Hyderabadi Chicken Biryani", "desc": "Aromatic basmati rice cooked with tender chicken and spices.", "price": 350, "cat": "Main Course", "image_filename": "menu_1.jpeg"},
             {"name": "Mutton Biryani", "desc": "Rich and flavorful mutton cooked with fragrant rice.", "price": 450, "cat": "Main Course", "image_filename": "menu_2.jpeg"},
             {"name": "Veg Biryani", "desc": "Mixed vegetables and basmati rice cooked in Hyderabadi style.", "price": 280, "cat": "Main Course", "image_filename": "menu_3.jpeg"},
@@ -413,24 +419,24 @@ def populate_sample_restaurant_data():
             {"name": "Lassi (Sweet)", "desc": "Refreshing yogurt-based drink.", "price": 80, "cat": "Drinks", "image_filename": "menu_default.jpg"},
             {"name": "Qubani ka Meetha", "desc": "Apricot dessert, a Hyderabadi specialty.", "price": 150, "cat": "Desserts", "image_filename": "menu_default.jpg"}
         ]},
-        {"name": "Cafe Coffee Day", "cuisine": "Cafe", "address": "Multiple Locations", "image_filename": "restaurent_b.jpeg", "menu": [
+        {"name": "Cafe Coffee Day", "cuisine": "Cafe", "address": "Multiple Locations", "description": "Popular cafe chain serving coffee and snacks.", "image_filename": "restaurent_b.jpeg", "menu": [
             {"name": "Cold Coffee", "desc": "Classic cold coffee.", "price": 180, "cat": "Drinks", "image_filename": "menu_4.jpeg"},
             {"name": "Cappuccino", "desc": "Espresso with steamed milk foam.", "price": 150, "cat": "Drinks", "image_filename": "menu_5.jpeg"},
             {"name": "Cafe Latte", "desc": "Espresso with steamed milk.", "price": 160, "cat": "Drinks", "image_filename": "menu_default.jpg"},
             {"name": "Chocolate Brownie", "desc": "Warm chocolate brownie.", "price": 120, "cat": "Desserts", "image_filename": "menu_default.jpg"}
         ]},
-        {"name": "Punjabi Tadka", "cuisine": "North Indian", "address": "Koramangala, Bangalore", "image_filename": "restaurent_c.jpeg", "menu": [
+        {"name": "Punjabi Tadka", "cuisine": "North Indian", "address": "Koramangala, Bangalore", "description": "Authentic Punjabi cuisine with rich flavors.", "image_filename": "restaurent_c.jpeg", "menu": [
             {"name": "Butter Chicken", "desc": "Creamy and rich chicken curry.", "price": 400, "cat": "Main Course", "image_filename": "menu_default.jpg"},
             {"name": "Dal Makhani", "desc": "Black lentils and kidney beans cooked in a creamy sauce.", "price": 300, "cat": "Main Course", "image_filename": "menu_default.jpg"},
             {"name": "Paneer Tikka Masala", "desc": "Grilled paneer in a spiced curry.", "price": 350, "cat": "Main Course", "image_filename": "menu_default.jpg"},
             {"name": "Gulab Jamun", "desc": "Soft, deep-fried milk solids soaked in sugar syrup.", "price": 100, "cat": "Desserts", "image_filename": "menu_default.jpg"},
             {"name": "Sweet Lassi", "desc": "Traditional Punjabi sweet yogurt drink.", "price": 90, "cat": "Drinks", "image_filename": "menu_default.jpg"}
         ]},
-        {"name": "The Great Hall Baluchi", "cuisine": "Indian", "address": "The Lalit, New Delhi", "image_filename": "baluchi-the-great-hall.jpg", "menu": [
+        {"name": "The Great Hall Baluchi", "cuisine": "Indian", "address": "The Lalit, New Delhi", "description": "Fine dining with exquisite Indian dishes.", "image_filename": "baluchi-the-great-hall.jpg", "menu": [
             {"name": "Dal Baluchi", "desc": "Signature slow-cooked black lentils.", "price": 650, "cat": "Main Course", "image_filename": "menu_default.jpg"},
             {"name": "Subz Biryani", "desc": "Vegetable biryani with aromatic spices.", "price": 750, "cat": "Main Course", "image_filename": "menu_default.jpg"}
         ]},
-        {"name": "Badkul Restaurant", "cuisine": "Multi-cuisine", "address": "Civil Lines, Jabalpur", "image_filename": "badkul.jpeg", "menu": [
+        {"name": "Badkul Restaurant", "cuisine": "Multi-cuisine", "address": "Civil Lines, Jabalpur", "description": "A mix of Indian and international cuisines.", "image_filename": "badkul.jpeg", "menu": [
             {"name": "Special Thali", "desc": "A complete meal with multiple dishes.", "price": 300, "cat": "Main Course", "image_filename": "menu_default.jpg"},
             {"name": "Chilli Paneer", "desc": "Spicy Indo-Chinese paneer dish.", "price": 250, "cat": "Starters", "image_filename": "menu_default.jpg"}
         ]}
@@ -451,6 +457,7 @@ def populate_sample_restaurant_data():
                     r_data["name"], 
                     r_data["cuisine"], 
                     r_data["address"], 
+                    description=r_data.get("description"), 
                     image_filename=r_data.get("image_filename")
                 )
                 if new_r:

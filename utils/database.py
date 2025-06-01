@@ -57,13 +57,14 @@ def init_restaurants_table():
             name TEXT NOT NULL,
             cuisine_type TEXT,
             address TEXT,
-            image_filename TEXT, -- Added image_filename column
+            description TEXT, -- Added description column
+            image_filename TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     conn.commit()
     conn.close()
-    log("Restaurants table initialized.")
+    log("Restaurants table initialized (with description).")
 
 def init_menu_items_table():
     """Initializes the menu_items table."""

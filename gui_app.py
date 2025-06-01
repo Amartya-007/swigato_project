@@ -12,13 +12,18 @@ from gui_components.signup_screen import SignupScreen
 from gui_components.main_app_screen import MainAppScreen
 from gui_components.menu_screen import MenuScreen
 from gui_components.cart_screen import CartScreen
+from gui_components.admin_screen import AdminScreen  # Import AdminScreen
 from cart.models import Cart
 from users.auth import User
+from users.models import User  # Ensure User is imported
+from orders.models import create_order
 
 # Import for DB setup
 from utils.database import initialize_database
 from restaurants.models import populate_sample_restaurant_data
 
+# Import logger
+from utils.logger import log
 
 class App(ctk.CTk):
     def __init__(self):
@@ -46,10 +51,37 @@ class App(ctk.CTk):
         self.cart: Cart | None = None
 
         self.current_screen_frame = None
+        self.admin_screen = None  # Initialize admin_screen attribute
+
+        # Master list for user data, to be managed by the App instance
+        self.master_users_data = [
+            {'id': 1, 'username': 'AliceAdmin', 'is_admin': True, 'address': '123 Admin St, Suite 100, Admintown, AD 12345'},
+            {'id': 2, 'username': 'BobUser', 'is_admin': False, 'address': '456 User Ave, Apt 2B, Userville, US 67890'},
+            {'id': 3, 'username': 'CharlieMgr', 'is_admin': True, 'address': '789 Manager Rd, HQ, Manageton, MA 01234'},
+            {'id': 4, 'username': 'DianaDev', 'is_admin': False, 'address': '101 Developer Ln, Code City, DV 54321'},
+            {'id': 5, 'username': 'EveTester', 'is_admin': False, 'address': '202 Test Dr, Bugsville, TS 67890'},
+            {'id': 6, 'username': 'FrankSupport', 'is_admin': True, 'address': '303 Help St, Supportville, SP 13579'},
+            {'id': 7, 'username': 'GraceClient', 'is_admin': False, 'address': '404 Client Rd, Clientburg, CL 24680'},
+            {'id': 8, 'username': 'HenrySales', 'is_admin': False, 'address': '505 Sales Ave, Saleston, SA 97531'},
+            {'id': 9, 'username': 'IvyIntern', 'is_admin': False, 'address': '606 Intern Blvd, Internville, IN 86420'},
+            {'id': 10, 'username': 'JackCEO', 'is_admin': True, 'address': '707 Executive Pkwy, Corp City, CC 11223'}
+        ]
 
         # Initialize database and populate sample data
         initialize_database()
         populate_sample_restaurant_data()
+
+        self.app_callbacks = {
+            "show_signup_screen": self.show_signup_screen,
+            "show_login_screen": self.show_login_screen,
+            "_post_login_navigation": self._post_login_navigation,  # Add the post login navigation
+            "show_menu_screen": self.show_menu_screen,
+            "show_cart_screen": self.show_cart_screen,
+            "handle_checkout": self.handle_checkout,
+            "logout": self.logout,
+            "show_admin_screen": self.show_admin_screen,
+            "show_main_app_screen": self.show_main_app_screen  # Ensure this callback is present
+        }
 
         self.show_login_screen()
 
@@ -65,7 +97,8 @@ class App(ctk.CTk):
         self._center_window(width, height)
 
     def _create_login_screen(self):
-        return LoginScreen(self, self.show_signup_screen, self.show_main_app_screen)
+        # Pass _post_login_navigation as the success callback
+        return LoginScreen(self, self.show_signup_screen, self._post_login_navigation)
 
     def _create_signup_screen(self):
         return SignupScreen(self, self.show_login_screen)
@@ -74,7 +107,14 @@ class App(ctk.CTk):
         return MainAppScreen(self, self.current_user, self.show_menu_screen, self.show_cart_screen, self.logout)
 
     def _create_menu_screen(self, restaurant):
-        return MenuScreen(self, self.current_user, restaurant, self.show_cart_screen)
+        # Ensure self.menu_screen_instance is created and stored
+        self.menu_screen_instance = MenuScreen(
+            app_ref=self,  # Pass self (the App instance) as app_ref
+            user=self.current_user,
+            restaurant=restaurant,
+            show_cart_callback=self.show_cart_screen
+        )
+        return self.menu_screen_instance
 
     def _create_cart_screen(self):
         self.cart_screen_instance = CartScreen(
@@ -87,38 +127,91 @@ class App(ctk.CTk):
         )
         return self.cart_screen_instance
 
+    def _initialize_screens(self):
+        if self.admin_screen is None or not self.admin_screen.winfo_exists(): # Modified to check winfo_exists
+            log("INFO: AdminScreen is None or destroyed in _initialize_screens. Creating new instance.")
+            # Pass the master_users_data to AdminScreen constructor
+            self.admin_screen = AdminScreen(self, self.app_callbacks, self.current_user)
+        else:
+            log("INFO: AdminScreen already exists and is valid in _initialize_screens.")
+
     def _switch_screen(self, screen_factory_method, *factory_args, title, width, height):
         if self.current_screen_frame:
+            # No special handling needed for self.admin_screen here before destroy,
+            # the factory method will use winfo_exists() to decide on recreation.
             self.current_screen_frame.destroy()
             self.current_screen_frame = None
 
         self.current_screen_frame = screen_factory_method(*factory_args)
+        
         self.current_screen_frame.pack(fill="both", expand=True)
         self._set_window_properties(title, width, height)
 
-    def show_login_screen(self, username=None):
+        # If the current screen is AdminScreen, and it has refresh_data, call it.
+        # This ensures data is fresh after the screen is packed and visible.
+        if isinstance(self.current_screen_frame, AdminScreen):
+            if hasattr(self.current_screen_frame, 'refresh_data') and callable(getattr(self.current_screen_frame, 'refresh_data')):
+                log("INFO: AdminScreen is packed and current. Calling refresh_data().")
+                self.current_screen_frame.refresh_data()
+            else:
+                log("WARNING: AdminScreen instance does not have a callable refresh_data method.")
+
+    def _post_login_navigation(self, user: User):
+        log(f"INFO: _post_login_navigation called for user: {user.username if user else 'None'}. Admin status: {user.is_admin if user else 'N/A'}")
+        self.current_user = user
+        if not user:
+            log(f"ERROR: _post_login_navigation called with None user.")
+            self.show_login_screen()
+            return
+
+        self.cart = Cart(user_id=user.user_id)
+        log(f"INFO: User {user.username} logged in. Is Admin: {user.is_admin}")
+        if user.is_admin:
+            self.show_admin_screen(user)
+        else:
+            self.show_main_app_screen(user)
+
+    def show_login_screen(self, username_to_fill=None):
         self.current_user = None
         self.current_restaurant = None
         self.cart = None
 
         self._switch_screen(self._create_login_screen, title="Swigato - Login", width=400, height=550)
 
-        if username:
-            self.current_screen_frame.username_entry.delete(0, 'end')
-            self.current_screen_frame.username_entry.insert(0, username)
-            self.current_screen_frame.password_entry.focus_set()
-        else:
-            if not self.current_screen_frame.username_entry.get():
-                self.current_screen_frame.username_entry.focus_set()
-            else:
+        if username_to_fill:
+            if self.current_screen_frame and \
+               hasattr(self.current_screen_frame, 'username_entry') and self.current_screen_frame.username_entry and self.current_screen_frame.username_entry.winfo_exists() and \
+               hasattr(self.current_screen_frame, 'password_entry') and self.current_screen_frame.password_entry and self.current_screen_frame.password_entry.winfo_exists():
+                self.current_screen_frame.username_entry.delete(0, 'end')
+                self.current_screen_frame.username_entry.insert(0, username_to_fill)
                 self.current_screen_frame.password_entry.focus_set()
+        else:
+            # Ensure current_screen_frame and its entries are valid before trying to set focus
+            if self.current_screen_frame and \
+               hasattr(self.current_screen_frame, 'username_entry') and \
+               self.current_screen_frame.username_entry and \
+               self.current_screen_frame.username_entry.winfo_exists():
+                
+                if not self.current_screen_frame.username_entry.get():
+                    self.current_screen_frame.username_entry.focus_set()
+                elif hasattr(self.current_screen_frame, 'password_entry') and \
+                     self.current_screen_frame.password_entry and \
+                     self.current_screen_frame.password_entry.winfo_exists():
+                    self.current_screen_frame.password_entry.focus_set()
+                else:
+                    # Fallback if password entry is not available, focus username
+                    self.current_screen_frame.username_entry.focus_set()
+            # If current_screen_frame or username_entry is not valid, focus cannot be set.
 
     def show_signup_screen(self):
         self._switch_screen(self._create_signup_screen, title="Swigato - Sign Up", width=400, height=600)
 
     def show_main_app_screen(self, user: User):
+        log(f"INFO: show_main_app_screen called for user: {user.username if user else 'None'}")
         self.current_user = user
-        self.cart = Cart(user_id=user.username if user else None)
+        if not self.cart or self.cart.user_id != user.user_id:
+            self.cart = Cart(user_id=user.user_id)
+            log(f"INFO: Cart initialized/updated for user {user.user_id} in show_main_app_screen.")
 
         self._switch_screen(self._create_main_app_screen, title="Swigato - Home", width=900, height=700)
 
@@ -128,10 +221,8 @@ class App(ctk.CTk):
             self.show_login_screen()
             return
         self.current_restaurant = restaurant
-        self._switch_screen(self._create_menu_screen, restaurant, title=f"Swigato - {restaurant.name}", width=900, height=700)
-        # self.current_screen_frame is now the menu_screen_instance
-        if self.current_screen_frame and hasattr(self.current_screen_frame, 'load_menu_items'):
-            self.current_screen_frame.load_menu_items()
+        # Pass restaurant to the factory method
+        self._switch_screen(self._create_menu_screen, restaurant, title=f"Swigato - {restaurant.name}", width=900, height=750)  # Increased height for reviews
 
     def show_menu_screen_from_cart(self, restaurant):
         self.show_menu_screen(restaurant)
@@ -151,51 +242,120 @@ class App(ctk.CTk):
         if self.current_screen_frame and hasattr(self.current_screen_frame, 'load_cart_items'):
             self.current_screen_frame.load_cart_items()
 
-    def handle_checkout(self):
-        if self.cart and self.cart.items:
-            print(f"Checkout initiated for user {self.current_user.username} with items: {self.cart.items}")
-            
-            # Actual order processing would happen here (e.g., save to DB)
-            # For now, we just clear the cart.
-            self.cart.items.clear()
-            
-            # If the current screen is CartScreen, update it to show it's empty before navigating
-            if self.current_screen_frame and isinstance(self.current_screen_frame, CartScreen):
-                 self.current_screen_frame.load_cart_items() # Update to show empty cart
-
-            # Show a success message dialog
+    def show_admin_screen(self, user):
+        """Shows the admin screen if the user is an admin."""
+        if not user or not user.is_admin:
+            log("ERROR: Unauthorized attempt to access admin screen.") # Logging the error
             try:
-                messagebox.showinfo("Checkout Successful", "Your order has been placed!")
+                messagebox.showerror("Access Denied", "You do not have permission to access the admin panel.")
             except Exception as e:
-                print(f"Error showing checkout messagebox: {e}")
+                log(f"Error showing messagebox: {e}") # Log messagebox error
+            self.show_login_screen() # Redirect to login
+            return
 
-            self.show_main_app_screen(self.current_user) # Go back to main screen
-        else:
-            print("Checkout attempt with empty cart.")
-            if self.current_screen_frame and isinstance(self.current_screen_frame, CartScreen):
-                try:
-                    messagebox.showwarning("Empty Cart", "Your cart is empty. Please add items before checking out.")
-                except Exception as e:
-                    print(f"Error showing empty cart messagebox: {e}")
+        self.current_user = user  # Ensure current user is set for the app context
+
+        # Define a local factory function for _switch_screen
+        def _get_or_create_admin_screen_for_switch_factory():
+            if self.admin_screen is None or not self.admin_screen.winfo_exists():
+                log("INFO: AdminScreen is None or destroyed. Creating new instance for _switch_screen.")
+                # Pass master_users_data to the AdminScreen constructor
+                self.admin_screen = AdminScreen(self, self.app_callbacks, self.current_user)
+            else:
+                log("INFO: Reusing existing AdminScreen instance for _switch_screen.")
+                self.admin_screen.user = self.current_user # Update user on the existing instance
+                
+            # DO NOT call refresh_data() here; it's called in _switch_screen after packing.
+            return self.admin_screen
+
+        log(f"INFO: Switching to Admin Screen for user {user.username}")
+        self._switch_screen(_get_or_create_admin_screen_for_switch_factory, title="Swigato - Admin Panel", width=1000, height=700)
+
+    def handle_review_submitted(self, restaurant_id):
+        # This method will be called by MenuScreen to notify that a review was submitted, so MenuScreen can refresh.
+        # Check if the current screen is indeed the MenuScreen and if it's for the correct restaurant
+        if isinstance(self.current_screen_frame, MenuScreen) and self.current_screen_frame.restaurant.id == restaurant_id:
+            self.current_screen_frame.refresh_reviews()
+
+    def handle_checkout(self):
+        if not self.current_user:
+            try:
+                messagebox.showerror("Authentication Error", "You must be logged in to checkout.")
+            except Exception as e:
+                print(f"Error showing messagebox: {e}")
+            self.show_login_screen()
+            return
+
+        if not self.cart or not self.cart.items:
+            try:
+                messagebox.showwarning("Empty Cart", "Your cart is empty. Please add items before checking out.")
+            except Exception as e:
+                print(f"Error showing messagebox: {e}")
+            # Optionally refresh cart screen if it's the current one and visible
+            if self.current_screen_frame and isinstance(self.current_screen_frame, CartScreen) and self.current_screen_frame.winfo_ismapped():
+                self.current_screen_frame.load_cart_items()
+            return
+
+        if not self.current_restaurant:
+            try:
+                messagebox.showerror("Order Error", "Cannot determine the restaurant for this order. Please go back to the menu and try again.")
+            except Exception as e:
+                print(f"Error showing messagebox: {e}")
+            self.show_main_app_screen() 
+            return
+
+        user_id = self.current_user.username
+        restaurant_id = self.current_restaurant.restaurant_id
+        restaurant_name = self.current_restaurant.name
+        cart_items_dict = self.cart.items 
+        total_amount = self.cart.get_total_price()
+
+        # Log the attempt
+        print(f"Attempting to create order: UserID: {user_id}, RestID: {restaurant_id}, RestName: {restaurant_name}, Total: {total_amount}")
+
+        try:
+            restaurant_id = self.current_restaurant.restaurant_id
+            
+            order_id_or_obj = create_order(
+                user_id=self.current_user.username,
+                restaurant_id=restaurant_id,
+                restaurant_name=self.current_restaurant.name,
+                cart_items=self.cart.get_items_for_order(),  # Corrected: items -> cart_items
+                total_amount=self.cart.get_total_price(),
+                user_address=self.current_user.address if self.current_user.address else "Not specified"  # Corrected: reinstated delivery_address as user_address
+            )
+            
+            # The create_order function returns an Order object or None
+            if order_id_or_obj and hasattr(order_id_or_obj, 'order_id'):
+                actual_order_id = order_id_or_obj.order_id
+                print(f"Order created successfully: Order ID {actual_order_id}")
+                messagebox.showinfo("Order Placed", f"Your order has been placed successfully!\nOrder ID: {actual_order_id}")
+                self.cart.items.clear()
+                self.show_main_app_screen(self.current_user)
+            else:
+                messagebox.showerror("Order Failed", "There was an issue placing your order. Please try again.")
+                print("Error: Order creation failed, create_order returned None or an unexpected object.")
+        except Exception as e:
+            messagebox.showerror("Order Error", f"An unexpected error occurred: {e}")
+            print(f"Error: Exception during order creation or post-order actions: {e}")
 
     def logout(self):
+        log(f"INFO: User {self.current_user.username if self.current_user else 'Unknown'} logging out.")
         self.current_user = None
         self.current_restaurant = None
-        if self.cart:
-            self.cart.items = {}
-            self.cart = None
-
-        remember_me_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "remember_me.json")
-        if os.path.exists(remember_me_file_path):
-            try:
-                with open(remember_me_file_path, 'w') as f:
-                    json.dump({}, f)
-            except Exception as e:
-                print(f"Error clearing remember_me.json on logout: {e}")
-
+        self.cart = None
+        # Clear any sensitive data from screens if necessary
+        # For example, if admin_screen holds sensitive data, clear it.
+        if self.admin_screen:
+            # Add a method to admin_screen to clear its state if needed
+            pass 
         self.show_login_screen()
+        log(f"INFO: Logout complete. Showing login screen.")
+
+    def run(self):
+        self.mainloop()
 
 
 if __name__ == "__main__":
     app = App()
-    app.mainloop()
+    app.run()

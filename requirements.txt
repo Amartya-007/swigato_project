@@ -2,3 +2,4 @@ rich
 bcrypt
 customtkinter
 Pillow
+CTkTable

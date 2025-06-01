@@ -30,6 +30,22 @@ class User:
         finally:
             conn.close()
 
+    def update_admin_status(self, new_admin_status: bool):
+        """Updates the user's admin status in the database."""
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("UPDATE users SET is_admin = ? WHERE user_id = ?", (new_admin_status, self.user_id))
+            conn.commit()
+            self.is_admin = new_admin_status # Update the instance attribute as well
+            log(f"Admin status for user ID {self.user_id} ('{self.username}') updated to {new_admin_status} in DB.") # Corrected f-string
+            return True
+        except Exception as e:
+            log(f"Error updating admin status for user ID {self.user_id} ('{self.username}'): {e}") # Corrected f-string
+            return False
+        finally:
+            conn.close()
+
     @staticmethod
     def create(username, password, address=None, is_admin=False): # Added is_admin
         """Creates a new user in the database."""
@@ -94,12 +110,13 @@ class User:
 
     @staticmethod
     def get_all_users():
-        """Retrieves all users from the database."""
+        """Retrieves all users from the database, ordered by user_id ascending.""" # Updated docstring
         conn = get_db_connection()
         cursor = conn.cursor()
         users = []
         try:
-            cursor.execute("SELECT user_id, username, password_hash, address, created_at, is_admin FROM users ORDER BY username")
+            # Modified SQL query to order by user_id ASC
+            cursor.execute("SELECT user_id, username, password_hash, address, created_at, is_admin FROM users ORDER BY user_id ASC")
             rows = cursor.fetchall()
             for row in rows:
                 users.append(User(user_id=row['user_id'], username=row['username'],

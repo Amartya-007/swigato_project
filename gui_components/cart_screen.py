@@ -1,6 +1,9 @@
 import customtkinter as ctk
 from PIL import Image, ImageTk
-from gui_constants import FRAME_FG_COLOR, FRAME_BORDER_COLOR, BUTTON_FG_COLOR, BUTTON_HOVER_COLOR, TEXT_COLOR, SUCCESS_COLOR, ERROR_COLOR
+from gui_constants import (
+    FRAME_FG_COLOR, FRAME_BORDER_COLOR, BUTTON_MAIN_BG_COLOR, # Changed from BUTTON_FG_COLOR
+    BUTTON_HOVER_COLOR, TEXT_COLOR, SUCCESS_COLOR, ERROR_COLOR, BUTTON_TEXT_COLOR # Added BUTTON_TEXT_COLOR
+)
 from utils.image_loader import load_image # Assuming you have this utility
 from cart.models import CartItem # For type hinting
 
@@ -28,9 +31,9 @@ class CartScreen(ctk.CTkFrame):
             self.header_frame,
             text="< Back to Menu",
             command=self._go_back_to_menu, # This will use self.show_menu_callback
-            fg_color=BUTTON_FG_COLOR,
+            fg_color=BUTTON_MAIN_BG_COLOR, # Use BUTTON_MAIN_BG_COLOR for background
             hover_color=BUTTON_HOVER_COLOR,
-            text_color=TEXT_COLOR
+            text_color=BUTTON_TEXT_COLOR # Use BUTTON_TEXT_COLOR for text
         )
         self.back_button.grid(row=0, column=0, sticky="w")
 

@@ -6,11 +6,11 @@ from users.auth import log_in
 from gui_constants import PRIMARY_COLOR, BACKGROUND_COLOR, ENTRY_BG_COLOR, TEXT_COLOR, BUTTON_HOVER_COLOR, SUCCESS_COLOR, DISABLED_BUTTON_COLOR
 
 class LoginScreen(ctk.CTkFrame):
-    def __init__(self, master, show_signup_screen_callback, show_main_app_screen_callback):  # Modified signature
+    def __init__(self, master, show_signup_screen_callback, login_success_callback):  # Modified signature
         super().__init__(master, fg_color=BACKGROUND_COLOR)
         self.master = master
-        self.show_signup_screen_callback = show_signup_screen_callback  # Store callback
-        self.show_main_app_screen_callback = show_main_app_screen_callback  # Store callback
+        self.show_signup_screen_callback = show_signup_screen_callback
+        self.login_success_callback = login_success_callback  # Store the new generic callback
         self.password_visible = False  # State for password visibility
 
         # Define path for remember_me.json
@@ -129,8 +129,8 @@ class LoginScreen(ctk.CTkFrame):
                 else:
                     self._clear_remembered_user()
                 self.status_label.configure(text=f"Welcome back, {user.username}!", text_color=SUCCESS_COLOR)
-                # Schedule the screen transition to happen after this method completes
-                self.master.after(0, lambda: self.show_main_app_screen_callback(user))
+                # Schedule the screen transition using the new callback
+                self.master.after(0, lambda: self.login_success_callback(user))  # MODIFIED THIS LINE
             else:
                 self.status_label.configure(text="Invalid username or password.", text_color=PRIMARY_COLOR)
                 # Only re-enable the button if login failed and the widget still exists

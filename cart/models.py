@@ -51,6 +51,10 @@ class Cart:
     def get_total_price(self):
         return sum(item.item_total for item in self.items.values())
 
+    def get_items_for_order(self):
+        """Returns a list of CartItem objects, suitable for order creation."""
+        return list(self.items.values())
+
     def clear_cart(self):
         self.items = {}
         log("Cart cleared.")
