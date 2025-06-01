@@ -1,6 +1,6 @@
 # Swigato CLI - My Awesome Food App! 🍔🍕🍦
 
-*Terminal and GUI-based food ordering app built with Python and SQLite* 
+## *Terminal and GUI-based food ordering app built with Python and SQLite*
 
 Hey there! This is **Amartya Vishwakarma**, and welcome to Swigato! This is a cool little command-line food ordering app I built. Think of it like a mini Swiggy or Zomato, but all in your terminal. I originally just stored data in memory, but then I was like, "Nah, let's make this legit," so I switched it over to use an SQLite database. That means all your user stuff, orders, and even those spicy reviews get saved properly.
 
