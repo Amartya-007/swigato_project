@@ -1,8 +1,16 @@
 # Swigato CLI - My Awesome Food App! 🍔🍕🍦
 
+*Terminal and GUI-based food ordering app built with Python and SQLite* 
+
 Hey there! This is **Amartya Vishwakarma**, and welcome to Swigato! This is a cool little command-line food ordering app I built. Think of it like a mini Swiggy or Zomato, but all in your terminal. I originally just stored data in memory, but then I was like, "Nah, let's make this legit," so I switched it over to use an SQLite database. That means all your user stuff, orders, and even those spicy reviews get saved properly.
 
 I also used the `rich` library for Python to make the terminal output look way better – because who likes boring text, right? Plus, there's a whole admin section where you (or, well, *I*) can manage everything.
+
+## Project Evolution: From CLI to GUI ✨
+
+This project started as a command-line application, focusing on core food ordering and admin functionalities. Recently, I've embarked on a journey to transform it into a graphical user interface (GUI) application using `CustomTkinter`! This makes it more user-friendly and visually appealing.
+
+A key part of this transition has been ensuring that all data operations, especially in the Admin Panel, are robust and persistent. The user management features in the Admin screen now directly interact with the SQLite database, ensuring all additions, edits, and deletions of users are saved permanently.
 
 ## So, What Can You Do Here?
 
@@ -23,9 +31,10 @@ I also used the `rich` library for Python to make the terminal output look way b
 
 ### If You're Me (Admin Superpowers! 🦸‍♂️)
 
-* **Secret Admin Panel:** My control center for all things Swigato.
-* **User Control:**
-  * See everyone who's signed up.
+* **Secret Admin Panel:** My control center for all things Swigato, now with a sleek GUI!
+* **User Control (Now Database-Powered!):**
+  * See everyone who's signed up, with data loaded directly from the database.
+  * Add new users, edit existing user details (username, address, admin status), and delete users – all changes are saved persistently in the database.
   * Boot users if they're being naughty (but I can't delete myself, lol).
 * **Order Overlord:**
   * View every single order, whether from a user or a guest.
@@ -47,7 +56,9 @@ I also used the `rich` library for Python to make the terminal output look way b
 
 * **Python 3.something:** The brains of the operation.
 * **SQLite:** My go-to for a simple, file-based database. No fancy server needed!
-* **`rich`:** Makes the command line look *rich* and fancy. Tables, colors, the works.
+* **`CustomTkinter`:** For building the modern graphical user interface.
+* **`CTkTable`:** A CustomTkinter add-on used to display data nicely in tables within the GUI.
+* **`rich`:** (Used in the original CLI version) Makes the command line look *rich* and fancy. Tables, colors, the works.
 * **`bcrypt`:** For scrambling passwords so nobody can steal 'em.
 * **My Own Validation Magic:** Made sure you can't just type gibberish everywhere.
 * **Logging:** Keeps a diary of what's happening in `data/swigato_app.log`, just in case.
@@ -56,9 +67,12 @@ I also used the `rich` library for Python to make the terminal output look way b
 
 ```text
 swigato_project/
-├── admin/                  # Where all the admin magic happens
+├── admin/                  # Where all the admin magic happens (primarily for CLI version logic)
 │   ├── __init__.py
 │   └── actions.py
+├── assets/                 # Images and other static files for the GUI
+│   ├── menu_items/
+│   └── restaurants/
 ├── cart/                   # For your shopping cart stuff
 │   ├── __init__.py
 │   └── models.py
@@ -68,6 +82,14 @@ swigato_project/
 ├── delivery/               # Maybe for drone delivery in v2? (kidding... mostly)
 │   ├── __init__.py
 │   └── tracker.py
+├── gui_components/         # All the different screens and custom widgets for the GUI
+│   ├── admin_screen.py
+│   ├── cart_screen.py
+│   ├── login_screen.py
+│   ├── main_app_screen.py
+│   ├── menu_screen.py
+│   ├── review_submission_screen.py
+│   └── signup_screen.py
 ├── orders/                 # All about your food orders
 │   ├── __init__.py
 │   └── models.py
@@ -84,10 +106,16 @@ swigato_project/
 ├── utils/                  # Handy helper scripts
 │   ├── __init__.py
 │   ├── database.py         # Talks to the SQLite database
+│   ├── image_loader.py     # Helper for loading images in the GUI
 │   ├── logger.py           # Sets up the logging
 │   └── validation.py       # Makes sure your input is good
 ├── .gitignore              # Tells Git what to ignore (boring stuff)
-├── main.py                 # This is where you run the app!
+├── gui_app.py              # Main application file for the GUI version
+├── gui_constants.py        # Constants for GUI styling and theming
+├── main.py                 # Entry point, now likely to launch gui_app.py (or choose between CLI/GUI)
+├── requirements.txt        # Lists Python packages needed
+├── swigato_icon.ico        # Application icon
+├── swigato_icon.png        # Application icon (PNG version)
 └── README.md               # You're reading it! Hi!
 ```
 
@@ -108,17 +136,25 @@ swigato_project/
     For now, you probably just have the files in a folder.
 
 3. **Install the Goodies:**
-    Open your terminal, do `. code` [To Open VS Code you MORON], or just navigate to the project folder, and run this command to install the required libraries:
+    Open your terminal, do `. code` [To Open VS Code you MORON], or just navigate to the project folder, and run this command to install the required libraries from the `requirements.txt` file:
 
     ```bash
-    pip install rich bcrypt
+    pip install -r requirements.txt
     ```
 
+    (This will install `CustomTkinter`, `CTkTable`, `Pillow` (for images), `bcrypt`, and `rich`.)
+
 4. **Let's Go!**
-    Run this command:
+    Run this command (assuming `main.py` now launches the GUI):
 
     ```bash
     python main.py
+    ```
+
+    Or, if `gui_app.py` is the direct entry point for the GUI:
+
+    ```bash
+    python gui_app.py
     ```
 
     * Boom! The app should start. If it's the first time, it'll create the `swigato.db` file in the `data/` folder.
