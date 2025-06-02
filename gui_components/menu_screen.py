@@ -249,8 +249,9 @@ class MenuScreen(ctk.CTkFrame):
         
         submit_button = ctk.CTkButton(action_buttons_frame, text="Submit Review",
                                       command=self._submit_inline_review_action,
-                                      fg_color=SUCCESS_COLOR, hover_color=BUTTON_HOVER_COLOR)
-        submit_button.pack(side="left")
+                                      fg_color=PRIMARY_COLOR, 
+                                      hover_color=BUTTON_HOVER_COLOR)
+        submit_button.pack(side="left", padx=(10, 0))
 
     def _set_rating(self, rating_value):
         self.rating_var.set(rating_value)

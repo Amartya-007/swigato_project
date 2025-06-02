@@ -348,16 +348,16 @@ class AdminUsersScreen(ctk.CTkFrame): # Renamed class
         self.save_button_edit_dialog.pack(pady=(5,0), anchor="center")
 
         safe_focus(self.username_entry_edit)
-    
-        def _confirm_delete_user_from_dialog(self):
-            if self.current_edit_user_id is None or self.current_editing_username_for_dialog is None:
-                logger.warning("Attempted to delete user from edit dialog, but current_edit_user_id or username is not set.")
-                if hasattr(self, 'edit_user_dialog') and self.edit_user_dialog.winfo_exists():
-                    messagebox.showerror("Error", "Cannot identify user to delete. Please close and reopen the edit dialog.")
-                return
+
+    def _confirm_delete_user_from_dialog(self):
+        if self.current_edit_user_id is None or self.current_editing_username_for_dialog is None:
+            logger.warning("Attempted to delete user from edit dialog, but current_edit_user_id or username is not set.")
+            if hasattr(self, 'edit_user_dialog') and self.edit_user_dialog.winfo_exists():
+                messagebox.showerror("Error", "Cannot identify user to delete. Please close and reopen the edit dialog.")
+            return
 
         user_id_to_delete = self.current_edit_user_id
-        username_for_dialog = self.current_editing_username_for_dialog        # Prevent admin from deleting themselves
+        username_for_dialog = self.current_editing_username_for_dialog
         if self.loggedInUser and self.loggedInUser.user_id == user_id_to_delete:
             logger.warning(f"Admin user '{self.loggedInUser.username}' (ID: {self.loggedInUser.user_id}) attempted to delete themselves (User ID to delete: {user_id_to_delete}).")
             messagebox.showerror("Action Denied", "Administrators cannot delete their own accounts through this panel.")
