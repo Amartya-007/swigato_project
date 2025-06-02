@@ -1,9 +1,8 @@
 import customtkinter as ctk
 from CTkTable import CTkTable
 import logging
-from tkinter import messagebox # For simple confirmation dialog
-
-# Specific Admin Theme and Font constants are used
+from tkinter import messagebox
+import os
 from gui_constants import (
     FONT_FAMILY, HEADING_FONT_SIZE, BODY_FONT_SIZE, BUTTON_FONT_SIZE, # Font definitions
     ADMIN_BACKGROUND_COLOR, ADMIN_FRAME_FG_COLOR, ADMIN_TEXT_COLOR,      # Admin basic colors
@@ -11,14 +10,16 @@ from gui_constants import (
     ADMIN_TABLE_HEADER_BG_COLOR, ADMIN_TABLE_HEADER_TEXT_COLOR,     # Admin Table specific colors
     ADMIN_TABLE_ROW_LIGHT_COLOR, ADMIN_TABLE_ROW_DARK_COLOR,
     ADMIN_TABLE_BORDER_COLOR, ADMIN_TABLE_TEXT_COLOR,
-    ADMIN_BUTTON_FG_COLOR, ADMIN_BUTTON_HOVER_COLOR, ADMIN_BUTTON_TEXT_COLOR, ADMIN_PRIMARY_COLOR # Admin Button colors
+    ADMIN_BUTTON_FG_COLOR, ADMIN_BUTTON_HOVER_COLOR, ADMIN_BUTTON_TEXT_COLOR, ADMIN_PRIMARY_COLOR, # Admin Button colors
+    ICON_PATH, # Icon path for dialogs
+    set_swigato_icon, safe_focus, center_window # Utility functions
 )
 from users.models import User # Import the User model
 from utils.database import get_db_connection # For direct DB operations if needed, though User model should handle most
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("swigato_app.admin_users_screen") # Updated logger name
 
-class AdminScreen(ctk.CTkFrame):
+class AdminUsersScreen(ctk.CTkFrame): # Renamed class
     def __init__(self, master, app_callbacks, user, **kwargs): # Removed users_data_list
         super().__init__(master, fg_color=ADMIN_BACKGROUND_COLOR, **kwargs)
         self.app_callbacks = app_callbacks
@@ -26,7 +27,7 @@ class AdminScreen(ctk.CTkFrame):
         self.current_view_users = [] # To store the currently displayed (filtered/sorted) user objects
 
         self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=0) # Title and Back button row
+        self.grid_rowconfigure(0, weight=0) # Title row
         self.grid_rowconfigure(1, weight=0) # Controls frame (new)
         self.grid_rowconfigure(2, weight=1) # Table frame (shifted)
 
@@ -36,21 +37,8 @@ class AdminScreen(ctk.CTkFrame):
         self.current_edit_user_id = None # Will store the ID of the user being edited
 
         # Title
-        title_label = ctk.CTkLabel(self, text="Admin Panel - User Management", font=ctk.CTkFont(family=FONT_FAMILY, size=HEADING_FONT_SIZE, weight="bold"), text_color=ADMIN_TEXT_COLOR)
-        title_label.grid(row=0, column=0, padx=20, pady=(20, 10), sticky="nw")
-
-        # Back Button
-        back_button = ctk.CTkButton(
-            self,
-            text="Back to App",
-            command=lambda: self.app_callbacks['show_main_app_screen'](self.loggedInUser),
-            fg_color=ADMIN_BUTTON_FG_COLOR,
-            hover_color=ADMIN_BUTTON_HOVER_COLOR,
-            text_color=ADMIN_BUTTON_TEXT_COLOR,
-            font=ctk.CTkFont(family=FONT_FAMILY, size=BUTTON_FONT_SIZE),
-            corner_radius=8
-        )
-        back_button.grid(row=0, column=1, padx=20, pady=(20,10), sticky="ne")
+        title_label = ctk.CTkLabel(self, text="User Management", font=ctk.CTkFont(family=FONT_FAMILY, size=HEADING_FONT_SIZE, weight="bold"), text_color=ADMIN_TEXT_COLOR)
+        title_label.grid(row=0, column=0, padx=20, pady=(10, 10), sticky="nw") # Adjusted pady
 
         # Controls Frame
         self.controls_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -131,15 +119,19 @@ class AdminScreen(ctk.CTkFrame):
         self.search_entry.delete(0, "end")
         self.admin_filter_var.set("All")
         self._load_and_display_users()
-
+    
     def _open_add_user_dialog(self):
         if hasattr(self, 'add_user_dialog') and self.add_user_dialog.winfo_exists():
-            self.add_user_dialog.focus()
+            safe_focus(self.add_user_dialog)
             return
 
         self.add_user_dialog = ctk.CTkToplevel(self)
         self.add_user_dialog.title("Add New User")
-        self.add_user_dialog.geometry("400x450")
+        set_swigato_icon(self.add_user_dialog)
+        
+        # Center the dialog
+        center_window(self.add_user_dialog, 400, 450)
+        
         self.add_user_dialog.transient(self.master) # Dialog is transient to the main app window
         self.add_user_dialog.grab_set() # Modal behavior
 
@@ -198,7 +190,8 @@ class AdminScreen(ctk.CTkFrame):
         )
         cancel_button.pack(side="right")
         
-        self.username_entry_add.focus()
+        # Set safe focus on the username entry after dialog is shown
+        self.add_user_dialog.after(100, lambda: safe_focus(self.username_entry_add))
 
     def _save_new_user(self):
         username = self.username_entry_add.get().strip()
@@ -248,18 +241,20 @@ class AdminScreen(ctk.CTkFrame):
             return
         
         user_to_edit_obj = User.get_by_id(user_id_to_edit) # Fetch user object from DB
-
         if not user_to_edit_obj:
             logger.error(f"User with ID {user_id_to_edit} not found for editing in DB.")
-            messagebox.showerror("Error", "Could not find the user to edit. The user list may have been updated.", parent=self)
+            messagebox.showerror("Error", "Could not find the user to edit. The user list may have been updated.")
             self._load_and_display_users() # Refresh from DB
             return
         
-        self.current_edit_user_id = user_id_to_edit 
-
+        self.current_edit_user_id = user_id_to_edit
         self.edit_user_dialog = ctk.CTkToplevel(self)
         self.edit_user_dialog.title(f"Edit User - {user_to_edit_obj.username}")
-        self.edit_user_dialog.geometry("400x400") 
+        set_swigato_icon(self.edit_user_dialog)
+        
+        # Center the dialog
+        center_window(self.edit_user_dialog, 400, 400)
+        
         self.edit_user_dialog.transient(self.master)
         self.edit_user_dialog.grab_set()
 
@@ -304,7 +299,9 @@ class AdminScreen(ctk.CTkFrame):
             corner_radius=8
         )
         cancel_button.pack(side="right")
-        self.username_entry_edit.focus()
+        
+        # Set safe focus on the username entry after dialog is shown
+        self.edit_user_dialog.after(100, lambda: safe_focus(self.username_entry_edit))
 
     def _save_edited_user(self):
         if self.current_edit_user_id is None:
@@ -402,17 +399,15 @@ class AdminScreen(ctk.CTkFrame):
 
     def _confirm_delete_user(self, user_id_to_delete): 
         user_to_delete_obj = User.get_by_id(user_id_to_delete)
-
         if not user_to_delete_obj:
             logger.error(f"User with ID {user_id_to_delete} not found for deletion confirmation in DB.")
-            messagebox.showerror("Error", "User not found. The list may have been updated.", parent=self)
+            messagebox.showerror("Error", "User not found. The list may have been updated.")
             self._load_and_display_users()
             return
         
         confirm = messagebox.askyesno(
-            title="Confirm Deletion", 
-            message=f"Are you sure you want to delete user '{user_to_delete_obj.username}' (ID: {user_to_delete_obj.user_id})?",
-            parent=self 
+            "Confirm Deletion", 
+            f"Are you sure you want to delete user '{user_to_delete_obj.username}' (ID: {user_to_delete_obj.user_id})?"
         )
         if confirm:
             self._delete_user(user_id_to_delete, user_to_delete_obj.username)
@@ -420,17 +415,20 @@ class AdminScreen(ctk.CTkFrame):
     def _delete_user(self, user_id_to_delete, username_for_logging):
         if User.delete_by_username(username_for_logging):
             logger.info(f"User '{username_for_logging}' (ID: {user_id_to_delete}) deleted successfully from DB.")
-            self._load_and_display_users()
+            self._load_and_display_users()        
         else:
             logger.warning(f"Failed to delete user '{username_for_logging}' (ID: {user_id_to_delete}) from DB. They might have already been deleted or an error occurred.")
-            messagebox.showwarning("Deletion Failed", f"User '{username_for_logging}' could not be deleted. The list might have been updated or an error occurred.", parent=self)
+            messagebox.showwarning(
+                "Deletion Failed", 
+                f"User '{username_for_logging}' could not be deleted. The list might have been updated or an error occurred."
+            )
             self._load_and_display_users()
 
     def _toggle_admin_status(self, user_id_to_toggle): 
         user_to_modify_obj = User.get_by_id(user_id_to_toggle)
         if not user_to_modify_obj:
             logger.error(f"User with ID {user_id_to_toggle} not found for toggling admin status in DB.")
-            messagebox.showerror("Error", "User not found. The list may have been updated.", parent=self)
+            messagebox.showerror("Error", "User not found. The list may have been updated.")
             self._load_and_display_users()
             return
         
@@ -441,7 +439,7 @@ class AdminScreen(ctk.CTkFrame):
             self._load_and_display_users()
         else:
             logger.error(f"Failed to toggle admin status for user '{user_to_modify_obj.username}' (ID: {user_id_to_toggle}) in DB.")
-            messagebox.showerror("Error", "Failed to update admin status. Check logs.", parent=self)
+            messagebox.showerror("Error", "Failed to update admin status. Check logs.")
             self._load_and_display_users()
 
     def _load_and_display_users(self):
@@ -540,7 +538,7 @@ class AdminScreen(ctk.CTkFrame):
             self.user_table.edit_row(i, fg_color=current_bg_color, text_color=ADMIN_TABLE_TEXT_COLOR, hover_color=ADMIN_PRIMARY_ACCENT_COLOR, font=cell_font)
 
     def refresh_data(self):
-        logger.info("AdminScreen: Refreshing data (called externally)...")
+        logger.info("AdminUsersScreen: Refreshing data (called externally)...")
         self._load_and_display_users()
         self.update_idletasks()
 

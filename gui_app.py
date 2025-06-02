@@ -12,7 +12,7 @@ from gui_components.signup_screen import SignupScreen
 from gui_components.main_app_screen import MainAppScreen
 from gui_components.menu_screen import MenuScreen
 from gui_components.cart_screen import CartScreen
-from gui_components.admin_screen import AdminScreen  # Import AdminScreen
+from gui_components.admin_dashboard import AdminDashboard  # Import AdminDashboard
 from cart.models import Cart
 from users.auth import User
 from users.models import User  # Ensure User is imported
@@ -51,7 +51,7 @@ class App(ctk.CTk):
         self.cart: Cart | None = None
 
         self.current_screen_frame = None
-        self.admin_screen = None  # Initialize admin_screen attribute
+        self.admin_dashboard_instance = None  # Initialize admin_dashboard_instance attribute
 
         # Master list for user data, to be managed by the App instance
         self.master_users_data = [
@@ -127,18 +127,21 @@ class App(ctk.CTk):
         )
         return self.cart_screen_instance
 
-    def _initialize_screens(self):
-        if self.admin_screen is None or not self.admin_screen.winfo_exists(): # Modified to check winfo_exists
-            log("INFO: AdminScreen is None or destroyed in _initialize_screens. Creating new instance.")
-            # Pass the master_users_data to AdminScreen constructor
-            self.admin_screen = AdminScreen(self, self.app_callbacks, self.current_user)
+    def _get_or_create_admin_screen_for_switch_factory(self, user):
+        # This method now returns an instance of AdminDashboard
+        if not hasattr(self, 'admin_dashboard_instance') or \
+           not self.admin_dashboard_instance or \
+           not self.admin_dashboard_instance.winfo_exists():
+            log("INFO: Creating new AdminDashboard instance.")
+            self.admin_dashboard_instance = AdminDashboard(self, self.app_callbacks, user)
         else:
-            log("INFO: AdminScreen already exists and is valid in _initialize_screens.")
+            log("INFO: Returning existing AdminDashboard instance.")
+            # Ensure the correct user context if it could change (though typically admin user is fixed per session)
+            self.admin_dashboard_instance.loggedInUser = user 
+        return self.admin_dashboard_instance
 
     def _switch_screen(self, screen_factory_method, *factory_args, title, width, height):
         if self.current_screen_frame:
-            # No special handling needed for self.admin_screen here before destroy,
-            # the factory method will use winfo_exists() to decide on recreation.
             self.current_screen_frame.destroy()
             self.current_screen_frame = None
 
@@ -147,14 +150,13 @@ class App(ctk.CTk):
         self.current_screen_frame.pack(fill="both", expand=True)
         self._set_window_properties(title, width, height)
 
-        # If the current screen is AdminScreen, and it has refresh_data, call it.
-        # This ensures data is fresh after the screen is packed and visible.
-        if isinstance(self.current_screen_frame, AdminScreen):
+        # If the current screen is AdminDashboard, and it has refresh_data, call it.
+        if isinstance(self.current_screen_frame, AdminDashboard):
             if hasattr(self.current_screen_frame, 'refresh_data') and callable(getattr(self.current_screen_frame, 'refresh_data')):
-                log("INFO: AdminScreen is packed and current. Calling refresh_data().")
+                log("INFO: AdminDashboard is packed and current. Calling refresh_data().")
                 self.current_screen_frame.refresh_data()
             else:
-                log("WARNING: AdminScreen instance does not have a callable refresh_data method.")
+                log("WARNING: AdminDashboard instance does not have a callable refresh_data method.")
 
     def _post_login_navigation(self, user: User):
         log(f"INFO: _post_login_navigation called for user: {user.username if user else 'None'}. Admin status: {user.is_admin if user else 'N/A'}")
@@ -178,30 +180,27 @@ class App(ctk.CTk):
 
         self._switch_screen(self._create_login_screen, title="Swigato - Login", width=400, height=550)
 
-        if username_to_fill:
-            if self.current_screen_frame and \
-               hasattr(self.current_screen_frame, 'username_entry') and self.current_screen_frame.username_entry and self.current_screen_frame.username_entry.winfo_exists() and \
-               hasattr(self.current_screen_frame, 'password_entry') and self.current_screen_frame.password_entry and self.current_screen_frame.password_entry.winfo_exists():
+        # Bring window to front and focus
+        self.lift()
+        self.focus_force()
+        self.after(100, self._focus_login_entries, username_to_fill)
+
+    def _focus_login_entries(self, username_to_fill):
+        if self.current_screen_frame and \
+           hasattr(self.current_screen_frame, 'username_entry') and \
+           self.current_screen_frame.username_entry and \
+           self.current_screen_frame.username_entry.winfo_exists():
+            if username_to_fill:
                 self.current_screen_frame.username_entry.delete(0, 'end')
                 self.current_screen_frame.username_entry.insert(0, username_to_fill)
-                self.current_screen_frame.password_entry.focus_set()
-        else:
-            # Ensure current_screen_frame and its entries are valid before trying to set focus
-            if self.current_screen_frame and \
-               hasattr(self.current_screen_frame, 'username_entry') and \
-               self.current_screen_frame.username_entry and \
-               self.current_screen_frame.username_entry.winfo_exists():
-                
-                if not self.current_screen_frame.username_entry.get():
-                    self.current_screen_frame.username_entry.focus_set()
-                elif hasattr(self.current_screen_frame, 'password_entry') and \
-                     self.current_screen_frame.password_entry and \
-                     self.current_screen_frame.password_entry.winfo_exists():
+            # Focus logic: if username entry has text, focus password, else focus username
+            if self.current_screen_frame.username_entry.get():
+                if hasattr(self.current_screen_frame, 'password_entry') and \
+                   self.current_screen_frame.password_entry and \
+                   self.current_screen_frame.password_entry.winfo_exists():
                     self.current_screen_frame.password_entry.focus_set()
-                else:
-                    # Fallback if password entry is not available, focus username
-                    self.current_screen_frame.username_entry.focus_set()
-            # If current_screen_frame or username_entry is not valid, focus cannot be set.
+            else:
+                self.current_screen_frame.username_entry.focus_set()
 
     def show_signup_screen(self):
         self._switch_screen(self._create_signup_screen, title="Swigato - Sign Up", width=400, height=600)
@@ -221,59 +220,44 @@ class App(ctk.CTk):
             self.show_login_screen()
             return
         self.current_restaurant = restaurant
-        # Pass restaurant to the factory method
-        self._switch_screen(self._create_menu_screen, restaurant, title=f"Swigato - {restaurant.name}", width=900, height=750)  # Increased height for reviews
+        self._switch_screen(self._create_menu_screen, restaurant, title=f"Swigato - {restaurant.name}", width=900, height=750)
 
     def show_menu_screen_from_cart(self, restaurant):
         self.show_menu_screen(restaurant)
 
     def show_cart_screen(self):
-        if not self.current_user:  # Check current_user first
+        if not self.current_user:
             print("Error: User not logged in. Cannot show cart.")
             self.show_login_screen()
             return
-        if not self.cart:  # Then check cart
+        if not self.cart:
             print("Error: Cart not initialized. Cannot show cart.")
-            self.show_main_app_screen()  # Or some other appropriate screen
+            self.show_main_app_screen()
             return
 
         self._switch_screen(self._create_cart_screen, title=f"Swigato - {self.current_user.username}'s Cart", width=800, height=600)
-        # self.current_screen_frame is now the cart_screen_instance
         if self.current_screen_frame and hasattr(self.current_screen_frame, 'load_cart_items'):
             self.current_screen_frame.load_cart_items()
 
     def show_admin_screen(self, user):
-        """Shows the admin screen if the user is an admin."""
         if not user or not user.is_admin:
-            log("ERROR: Unauthorized attempt to access admin screen.") # Logging the error
+            log("ERROR: Unauthorized attempt to access admin screen.")
             try:
                 messagebox.showerror("Access Denied", "You do not have permission to access the admin panel.")
             except Exception as e:
-                log(f"Error showing messagebox: {e}") # Log messagebox error
-            self.show_login_screen() # Redirect to login
+                log(f"Error showing messagebox: {e}")
+            self.show_login_screen()
             return
 
-        self.current_user = user  # Ensure current user is set for the app context
+        self.current_user = user
 
-        # Define a local factory function for _switch_screen
         def _get_or_create_admin_screen_for_switch_factory():
-            if self.admin_screen is None or not self.admin_screen.winfo_exists():
-                log("INFO: AdminScreen is None or destroyed. Creating new instance for _switch_screen.")
-                # Pass master_users_data to the AdminScreen constructor
-                self.admin_screen = AdminScreen(self, self.app_callbacks, self.current_user)
-            else:
-                log("INFO: Reusing existing AdminScreen instance for _switch_screen.")
-                self.admin_screen.user = self.current_user # Update user on the existing instance
-                
-            # DO NOT call refresh_data() here; it's called in _switch_screen after packing.
-            return self.admin_screen
+            return self._get_or_create_admin_screen_for_switch_factory(user)
 
-        log(f"INFO: Switching to Admin Screen for user {user.username}")
+        log(f"INFO: Switching to Admin Dashboard for user {user.username}")
         self._switch_screen(_get_or_create_admin_screen_for_switch_factory, title="Swigato - Admin Panel", width=1000, height=700)
 
     def handle_review_submitted(self, restaurant_id):
-        # This method will be called by MenuScreen to notify that a review was submitted, so MenuScreen can refresh.
-        # Check if the current screen is indeed the MenuScreen and if it's for the correct restaurant
         if isinstance(self.current_screen_frame, MenuScreen) and self.current_screen_frame.restaurant.id == restaurant_id:
             self.current_screen_frame.refresh_reviews()
 
@@ -291,7 +275,6 @@ class App(ctk.CTk):
                 messagebox.showwarning("Empty Cart", "Your cart is empty. Please add items before checking out.")
             except Exception as e:
                 print(f"Error showing messagebox: {e}")
-            # Optionally refresh cart screen if it's the current one and visible
             if self.current_screen_frame and isinstance(self.current_screen_frame, CartScreen) and self.current_screen_frame.winfo_ismapped():
                 self.current_screen_frame.load_cart_items()
             return
@@ -310,7 +293,6 @@ class App(ctk.CTk):
         cart_items_dict = self.cart.items 
         total_amount = self.cart.get_total_price()
 
-        # Log the attempt
         print(f"Attempting to create order: UserID: {user_id}, RestID: {restaurant_id}, RestName: {restaurant_name}, Total: {total_amount}")
 
         try:
@@ -320,12 +302,11 @@ class App(ctk.CTk):
                 user_id=self.current_user.username,
                 restaurant_id=restaurant_id,
                 restaurant_name=self.current_restaurant.name,
-                cart_items=self.cart.get_items_for_order(),  # Corrected: items -> cart_items
+                cart_items=self.cart.get_items_for_order(),
                 total_amount=self.cart.get_total_price(),
-                user_address=self.current_user.address if self.current_user.address else "Not specified"  # Corrected: reinstated delivery_address as user_address
+                user_address=self.current_user.address if self.current_user.address else "Not specified"
             )
             
-            # The create_order function returns an Order object or None
             if order_id_or_obj and hasattr(order_id_or_obj, 'order_id'):
                 actual_order_id = order_id_or_obj.order_id
                 print(f"Order created successfully: Order ID {actual_order_id}")
@@ -344,11 +325,9 @@ class App(ctk.CTk):
         self.current_user = None
         self.current_restaurant = None
         self.cart = None
-        # Clear any sensitive data from screens if necessary
-        # For example, if admin_screen holds sensitive data, clear it.
-        if self.admin_screen:
-            # Add a method to admin_screen to clear its state if needed
-            pass 
+        if self.admin_dashboard_instance:
+            self.admin_dashboard_instance.destroy()
+            self.admin_dashboard_instance = None
         self.show_login_screen()
         log(f"INFO: Logout complete. Showing login screen.")
 

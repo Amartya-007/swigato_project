@@ -153,7 +153,7 @@ class SignupScreen(ctk.CTkFrame):
                 if success:
                     self.status_label.configure(text="Account created successfully! Redirecting to login...", text_color=SUCCESS_COLOR)
                     self.signup_button.configure(state="disabled", text="Account Created", fg_color=DISABLED_BUTTON_COLOR)
-                    self.after(2000, lambda: self.app.show_login_screen(username=username))
+                    self.after(2000, lambda: self.app.show_login_screen(username_to_fill=username))
                 else:
                     self.status_label.configure(text="Signup failed. Username might already exist or another issue occurred.", text_color=ERROR_COLOR)
                     self.signup_button.configure(state="normal", text=original_button_text, fg_color=PRIMARY_COLOR)

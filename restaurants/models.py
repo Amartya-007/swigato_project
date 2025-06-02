@@ -68,15 +68,16 @@ class MenuItem:
 
     @staticmethod
     def get_for_restaurant(restaurant_id):
-        log(f"MenuItem.get_for_restaurant called for restaurant_id: {restaurant_id}") # ADDED LOG
+        log(f"MenuItem.get_for_restaurant called for restaurant_id: {restaurant_id}") 
         conn = get_db_connection()
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         menu = []
         try:
-            cursor.execute("SELECT * FROM menu_items WHERE restaurant_id = ? ORDER BY category, name", (restaurant_id,))
+            # Modified SQL to order by item_id ASC
+            cursor.execute("SELECT * FROM menu_items WHERE restaurant_id = ? ORDER BY item_id ASC", (restaurant_id,))
             rows = cursor.fetchall()
-            log(f"Found {len(rows)} menu items for restaurant_id: {restaurant_id}") # ADDED LOG
+            log(f"Found {len(rows)} menu items for restaurant_id: {restaurant_id}") 
             for row in rows:
                 menu.append(MenuItem(**dict(row)))
             return menu
@@ -391,7 +392,8 @@ class Restaurant:
         cursor = conn.cursor()
         restaurants = []
         try:
-            cursor.execute("SELECT * FROM restaurants ORDER BY name")
+            # Modified SQL to order by restaurant_id ASC
+            cursor.execute("SELECT * FROM restaurants ORDER BY restaurant_id ASC")
             rows = cursor.fetchall()
             for row in rows:
                 restaurants.append(Restaurant(**dict(row)))

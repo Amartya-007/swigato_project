@@ -33,7 +33,7 @@ class Review:
 
     @staticmethod
     def get_all_reviews():
-        """Fetches all reviews from the database including restaurant name."""
+        """Fetches all reviews from the database including restaurant name, ordered by review_id ASC."""
         conn = get_db_connection()
         cursor = conn.cursor()
         reviews = []
@@ -43,7 +43,7 @@ class Review:
                        r.rating, r.comment, r.review_date 
                 FROM reviews r
                 JOIN restaurants res ON r.restaurant_id = res.restaurant_id
-                ORDER BY r.review_date DESC
+                ORDER BY r.review_id ASC
             """)
             rows = cursor.fetchall()
             for row in rows:
@@ -134,7 +134,7 @@ def get_reviews_for_restaurant(restaurant_id):
             FROM reviews r
             JOIN restaurants res ON r.restaurant_id = res.restaurant_id
             WHERE r.restaurant_id = ? 
-            ORDER BY r.review_date DESC
+            ORDER BY r.review_id ASC
         """, (restaurant_id,))
         rows = cursor.fetchall()
         for row in rows:

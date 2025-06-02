@@ -46,6 +46,28 @@ class User:
         finally:
             conn.close()
 
+    def update_password(self, new_password):
+        """Updates the user's password in the database after hashing it."""
+        if not new_password:
+            log(f"Password update for user ID {self.user_id} ('{self.username}') skipped: new password is empty.")
+            return False # Or raise an error
+
+        new_password_hash = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("UPDATE users SET password_hash = ? WHERE user_id = ?", 
+                           (new_password_hash.decode('utf-8'), self.user_id))
+            conn.commit()
+            self.password_hash = new_password_hash.decode('utf-8') # Update instance attribute
+            log(f"Password for user ID {self.user_id} ('{self.username}') updated successfully.")
+            return True
+        except Exception as e:
+            log(f"Error updating password for user ID {self.user_id} ('{self.username}'): {e}")
+            return False
+        finally:
+            conn.close()
+
     @staticmethod
     def create(username, password, address=None, is_admin=False): # Added is_admin
         """Creates a new user in the database."""

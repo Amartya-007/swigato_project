@@ -148,11 +148,11 @@ class LoginScreen(ctk.CTkFrame):
                     if remembered_username:
                         self.username_entry.insert(0, remembered_username)
                         self.remember_me_checkbox.select()  # Check the box if user was loaded
-                        self.password_entry.focus()  # Focus password if username is filled
+                        # Do not set focus here; let App.show_login_screen handle it
                         return
         except Exception as e:
             print(f"Error loading remembered user: {e}")
-        self.username_entry.focus()  # Focus username if not loaded or error
+        # Do not set focus here; let App.show_login_screen handle it
 
     def _save_remembered_user(self, username):
         try:

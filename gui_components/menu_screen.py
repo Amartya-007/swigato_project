@@ -7,6 +7,7 @@ from utils.image_loader import load_image
 from utils.logger import log
 from reviews.models import get_reviews_for_restaurant, add_review
 from users.models import User
+from tkinter import messagebox
 
 class MenuScreen(ctk.CTkFrame):
     def __init__(self, app_ref, user, restaurant, show_cart_callback):
@@ -240,13 +241,12 @@ class MenuScreen(ctk.CTkFrame):
         self.comment_textbox_widget.grid(row=3, column=0, padx=10, pady=(0,10), sticky="ew")
 
         action_buttons_frame = ctk.CTkFrame(container_frame, fg_color="transparent")
-        action_buttons_frame.grid(row=4, column=0, padx=10, pady=(0,10), sticky="e")
-
+        action_buttons_frame.grid(row=4, column=0, padx=10, pady=(0,10), sticky="e")        
         cancel_button = ctk.CTkButton(action_buttons_frame, text="Cancel",
                                         command=self._on_write_review_button_click,
                                         fg_color=SECONDARY_COLOR, hover_color=BUTTON_HOVER_COLOR)
         cancel_button.pack(side="left", padx=(0,10))
-
+        
         submit_button = ctk.CTkButton(action_buttons_frame, text="Submit Review",
                                       command=self._submit_inline_review_action,
                                       fg_color=SUCCESS_COLOR, hover_color=BUTTON_HOVER_COLOR)
@@ -272,15 +272,14 @@ class MenuScreen(ctk.CTkFrame):
             log("Error: Comment textbox widget not found during submission.")
             return
         comment = self.comment_textbox_widget.get("1.0", "end-1c").strip()
-
+        
         if rating == 0:
             self.status_label.configure(text="Please select a rating (1-5 stars).", text_color=ERROR_COLOR)
             self.after(3000, lambda: self.status_label.configure(text=""))
             return
-
+            
         if not self.user:
-            self.status_label.configure(text="You must be logged in to submit a review.", text_color=ERROR_COLOR)
-            self.after(3000, lambda: self.status_label.configure(text=""))
+            messagebox.showwarning("Login Required", "You must be logged in to submit a review.")
             log("Warning: Attempted to submit review without logged in user.")
             return
             
@@ -383,14 +382,12 @@ class MenuScreen(ctk.CTkFrame):
             self.status_label.configure(text="Error: Cart not available.", text_color=ERROR_COLOR)
         self.after(3000, lambda: self.status_label.configure(text=""))
 
-    def go_back_to_main_app(self):
-        self.app_ref.show_main_app_screen(self.user)
+    def go_back_to_main_app(self):        self.app_ref.show_main_app_screen(self.user)
 
     def _on_write_review_button_click(self):
         log(f"_on_write_review_button_click called. Current form visibility: {self.is_review_form_visible}")
         if not self.user:
-            self.status_label.configure(text="Please log in to write a review.", text_color=ERROR_COLOR)
-            self.after(3000, lambda: self.status_label.configure(text=""))
+            messagebox.showwarning("Login Required", "Please log in to write a review.")
             log("User not logged in. Cannot write review.")
             return
         

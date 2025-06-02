@@ -1,11 +1,15 @@
-\
 import customtkinter as ctk
 from tkinter import messagebox
-from gui_constants import TEXT_COLOR, BUTTON_FG_COLOR, BUTTON_HOVER_COLOR, SUCCESS_COLOR, ERROR_COLOR, FRAME_FG_COLOR
+from gui_constants import (
+    TEXT_COLOR, BUTTON_FG_COLOR, BUTTON_HOVER_COLOR, SUCCESS_COLOR, ERROR_COLOR, 
+    FRAME_FG_COLOR, ICON_PATH, set_swigato_icon, safe_focus, center_window
+)
 # Assuming Review model and add_review function are in reviews.models
 from reviews.models import add_review 
 from users.models import User # For type hinting
 from restaurants.models import Restaurant # For type hinting
+import os
+from tkinter import messagebox
 
 class ReviewSubmissionScreen(ctk.CTkToplevel):
     def __init__(self, app_ref, user: User, restaurant: Restaurant, menu_screen_ref=None):
@@ -16,11 +20,16 @@ class ReviewSubmissionScreen(ctk.CTkToplevel):
         self.menu_screen_ref = menu_screen_ref # To call a refresh method later
 
         self.title(f"Review {self.restaurant.name}")
-        self.geometry("450x450")
-        self.grab_set() # Make this window modal
         self.resizable(False, False)
         
+        # Center the dialog on screen
+        center_window(self, 450, 450)
+        
+        self.grab_set() # Make this window modal
         self.configure(fg_color=FRAME_FG_COLOR)
+
+        # Set Swigato icon safely
+        set_swigato_icon(self)
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(3, weight=1) # Textbox row
@@ -65,30 +74,28 @@ class ReviewSubmissionScreen(ctk.CTkToplevel):
                                            fg_color=SUCCESS_COLOR, hover_color="#00C78C")
         self.submit_button.grid(row=0, column=2)
         
-        self.comment_textbox.focus()
+        # Set safe focus on the comment textbox after dialog is shown
+        self.after(100, lambda: safe_focus(self.comment_textbox))
 
     def _submit_review(self):
         rating_str = self.rating_var.get()
         comment = self.comment_textbox.get("1.0", "end-1c").strip() # Get text and strip trailing newline
-
         if not rating_str:
-            messagebox.showerror("Error", "Please select a rating.", parent=self)
+            messagebox.showerror("Error", "Please select a rating.")
             return
-        
+
         try:
             rating = int(rating_str)
             if not (1 <= rating <= 5):
                 raise ValueError("Rating out of range")
         except ValueError:
-            messagebox.showerror("Error", "Invalid rating value. Please select a number between 1 and 5.", parent=self)
-            return
-
-        # Ensure user and restaurant objects are valid
+            messagebox.showerror("Error", "Invalid rating value. Please select a number between 1 and 5.")
+            return        # Ensure user and restaurant objects are valid
         if not self.user or not self.user.user_id or not self.user.username:
-            messagebox.showerror("Error", "User information is missing. Cannot submit review.", parent=self)
+            messagebox.showerror("Error", "User information is missing. Cannot submit review.")
             return
         if not self.restaurant or not self.restaurant.restaurant_id:
-            messagebox.showerror("Error", "Restaurant information is missing. Cannot submit review.", parent=self)
+            messagebox.showerror("Error", "Restaurant information is missing. Cannot submit review.")
             return
 
         # Call the add_review function from reviews.models
@@ -99,15 +106,14 @@ class ReviewSubmissionScreen(ctk.CTkToplevel):
             rating=rating,
             comment=comment
         )
-
         if new_review:
-            messagebox.showinfo("Success", "Review submitted successfully!", parent=self)
+            messagebox.showinfo("Success", "Review submitted successfully!")
             # Optionally, refresh the menu screen if a reference is passed
             if self.menu_screen_ref and hasattr(self.menu_screen_ref, 'refresh_reviews'):
                 self.menu_screen_ref.refresh_reviews()
             self.destroy() # Close the review window
         else:
-            messagebox.showerror("Error", "Failed to submit review. Please try again.", parent=self)
+            messagebox.showerror("Error", "Failed to submit review. Please try again.")
 
 if __name__ == '__main__':
     # This is for testing the ReviewSubmissionScreen independently
