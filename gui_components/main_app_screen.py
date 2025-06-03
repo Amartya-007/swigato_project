@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 from gui_constants import BACKGROUND_COLOR, TEXT_COLOR, PRIMARY_COLOR, BUTTON_HOVER_COLOR, FRAME_BORDER_COLOR, FRAME_FG_COLOR, SECONDARY_COLOR
 from utils.image_loader import load_image
 from utils.logger import log
+from orders.models import get_orders_by_user_id
 
 class MainAppScreen(ctk.CTkFrame):
     def __init__(self, app_ref, user, show_menu_callback, show_cart_callback, logout_callback):
@@ -23,8 +24,7 @@ class MainAppScreen(ctk.CTkFrame):
         header_frame.grid(row=0, column=0, padx=20, pady=(20, 10), sticky="ew")
         header_frame.grid_columnconfigure(0, weight=1) # Welcome message
         header_frame.grid_columnconfigure(1, weight=0) # View Cart button
-        header_frame.grid_columnconfigure(2, weight=0) # Logout button
-        header_frame.grid_columnconfigure(3, weight=0) # Admin Panel button (if admin)
+        header_frame.grid_columnconfigure(2, weight=0) # Admin Panel button (if admin)
 
         welcome_text = f"Welcome, {self.user.username}!"
         self.welcome_label = ctk.CTkLabel(header_frame, text=welcome_text,
@@ -52,22 +52,42 @@ class MainAppScreen(ctk.CTkFrame):
                 font=ctk.CTkFont(weight="bold")
             )
             admin_panel_button.grid(row=0, column=2, padx=(0,10), sticky="e")
-            logout_col = 3
-        else:
-            logout_col = 2
 
-        logout_button = ctk.CTkButton(header_frame, text="Logout",
-                                      command=self.logout_callback,
-                                      fg_color="#D32F2F",  # Red color for logout
-                                      hover_color="#B71C1C",
-                                      text_color=TEXT_COLOR,
-                                      font=ctk.CTkFont(weight="bold"))
-        logout_button.grid(row=0, column=logout_col, sticky="e")
+        # Only show Order History button for non-admin users
+        if not (hasattr(self.user, "is_admin") and self.user.is_admin):
+            order_history_button = ctk.CTkButton(header_frame, text="Order History",
+                                                 command=self.show_order_history,
+                                                 fg_color=SECONDARY_COLOR,
+                                                 hover_color=BUTTON_HOVER_COLOR,
+                                                 text_color=TEXT_COLOR,
+                                                 font=ctk.CTkFont(weight="bold"))
+            order_history_button.grid(row=0, column=3, padx=(10,0), sticky="e")
 
         # --- Restaurant List Scrollable Frame ---
         self.restaurant_scroll_frame = ctk.CTkScrollableFrame(self, fg_color=BACKGROUND_COLOR, border_width=0)
-        self.restaurant_scroll_frame.grid(row=1, column=0, padx=20, pady=10, sticky="nsew")
+        self.restaurant_scroll_frame.grid(row=1, column=0, padx=20, pady=(10,80), sticky="nsew")
         self.restaurant_scroll_frame.grid_columnconfigure(0, weight=1)
+
+        # --- Sticky Bottom Bar for Logout (use .place() to avoid grid/pack conflict) ---
+        self.bottom_bar = ctk.CTkFrame(self, fg_color="#fef2f2", height=60, corner_radius=0)
+        self.bottom_bar.place(relx=0, rely=1.0, relwidth=1.0, anchor="sw", y=0)
+        self.bottom_bar.pack_propagate(0)
+        border = ctk.CTkFrame(self.bottom_bar, fg_color="#FFCCBC", height=2)
+        border.pack(side="top", fill="x")
+
+        self.logout_button = ctk.CTkButton(
+            self.bottom_bar,
+            text="Logout",
+            command=self.logout_callback,
+            fg_color="#D32F2F",
+            hover_color="#B71C1C",
+            text_color="#FFFFFF",
+            font=ctk.CTkFont(weight="bold"),
+            corner_radius=12,
+            width=120,
+            height=40
+        )
+        self.logout_button.place(relx=1.0, rely=1.0, anchor="se", x=-20, y=-10)
 
         self.load_restaurants()
 
@@ -150,3 +170,80 @@ class MainAppScreen(ctk.CTkFrame):
         self.user = user
         self.welcome_label.configure(text=f"Welcome, {self.user.username}!")
         self.load_restaurants() # Reload restaurants, in case of user-specific content in future
+
+    def show_order_history(self):
+        # Destroy any previous order history window
+        if hasattr(self, 'order_history_window') and self.order_history_window:
+            self.order_history_window.destroy()
+        self.order_history_window = ctk.CTkToplevel(self)
+        self.order_history_window.title("Order History")
+        self.order_history_window.geometry("900x500")
+        self.order_history_window.grab_set()
+
+        # Light theme: white background, dark text
+        self.order_history_window.configure(fg_color=FRAME_FG_COLOR)
+        self.order_history_window.grid_columnconfigure(0, weight=1)
+        self.order_history_window.grid_rowconfigure(0, weight=0)
+        self.order_history_window.grid_rowconfigure(1, weight=1)
+
+        # Add heading label (centered, no corners, transparent background, orange text)
+        heading_label = ctk.CTkLabel(
+            self.order_history_window,
+            text="Your Order History",
+            font=ctk.CTkFont(size=25, weight="bold"),
+            text_color=PRIMARY_COLOR,
+            fg_color="transparent",
+            anchor="center",
+            justify="center"
+        )
+        heading_label.grid(row=0, column=0, pady=(18, 0), padx=20, sticky="n")
+
+        orders = get_orders_by_user_id(self.user.user_id)
+        orders = orders[:20]
+
+        # --- Scrollable Frame for Table ---
+        scroll_frame = ctk.CTkScrollableFrame(self.order_history_window, fg_color=FRAME_FG_COLOR, corner_radius=14, border_width=1, border_color=FRAME_BORDER_COLOR)
+        scroll_frame.grid(row=1, column=0, padx=24, pady=24, sticky="nsew")
+        scroll_frame.grid_columnconfigure(0, weight=1)
+        scroll_frame.grid_rowconfigure(0, weight=1)
+
+        headers = ["Order ID", "Restaurant", "Date", "Total (₹)", "Status", "Items", "Address"]
+        table_data = [headers]
+        for order in orders:
+            date_str = order.order_date.strftime('%Y-%m-%d %H:%M') if hasattr(order.order_date, 'strftime') else str(order.order_date)
+            items_str = ", ".join([f"{item.name} x{item.quantity}" for item in getattr(order, 'items', [])])
+            if len(items_str) > 60:
+                items_str = items_str[:57] + "..."
+            address_str = order.delivery_address or "N/A"
+            if len(address_str) > 30:
+                address_str = address_str[:27] + "..."
+            table_data.append([
+                order.order_id,
+                order.restaurant_name,
+                date_str,
+                f"{order.total_amount:.2f}",
+                order.status,
+                items_str,
+                address_str
+            ])
+
+        if len(table_data) == 1:
+            ctk.CTkLabel(scroll_frame, text="No orders found.", font=ctk.CTkFont(size=12), text_color=TEXT_COLOR, fg_color="transparent").pack(expand=True, anchor="center", padx=20, pady=20)
+            return
+
+        from CTkTable import CTkTable
+        cell_font = ctk.CTkFont(size=11)
+        header_font = ctk.CTkFont(size=12, weight="bold")
+        orders_table = CTkTable(
+            master=scroll_frame,
+            values=table_data,
+            font=cell_font,
+            header_color=FRAME_BORDER_COLOR,
+            text_color=TEXT_COLOR,
+            hover_color=PRIMARY_COLOR,
+            colors=[FRAME_FG_COLOR, BACKGROUND_COLOR],
+            corner_radius=10,
+            border_width=1,
+            border_color=FRAME_BORDER_COLOR
+        )
+        orders_table.pack(expand=True, fill="both", padx=8, pady=8)

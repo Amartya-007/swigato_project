@@ -6,8 +6,11 @@ from gui_constants import (FONT_FAMILY, ADMIN_BACKGROUND_COLOR, ADMIN_TEXT_COLOR
 from gui_components.admin_users_screen import AdminUsersScreen # Renamed from AdminScreen
 from gui_components.admin_orders_screen import AdminOrdersScreen
 from gui_components.admin_restaurants_screen import AdminRestaurantsScreen
-from gui_components.admin_menus_screen import AdminMenusScreen
 from gui_components.admin_reviews_screen import AdminReviewsScreen
+from users.models import User
+from restaurants.models import Restaurant
+from orders.models import Order
+from reviews.models import Review
 
 logger = logging.getLogger("swigato_app.admin_dashboard")
 
@@ -22,7 +25,8 @@ class AdminDashboard(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=0) # Sidebar - give it fixed width influence initially
         self.grid_columnconfigure(1, weight=1) # Content Area - let it expand
         self.grid_rowconfigure(0, weight=0)    # Title row
-        self.grid_rowconfigure(1, weight=1)    # Main content row (sidebar + content_frame)
+        self.grid_rowconfigure(1, weight=0)    # Stats row
+        self.grid_rowconfigure(2, weight=1)    # Main content row (sidebar + content_frame)
 
         # Title Label for the entire dashboard
         dashboard_title = ctk.CTkLabel(self, text="Swigato Admin Dashboard", 
@@ -46,36 +50,71 @@ class AdminDashboard(ctk.CTkFrame):
 
         # Sidebar Frame
         self.sidebar_frame = ctk.CTkFrame(self, width=180, corner_radius=10, fg_color=ADMIN_BACKGROUND_COLOR) # Reduced width
-        self.sidebar_frame.grid(row=1, column=0, padx=(20,10), pady=(0,20), sticky="nsw")
+        self.sidebar_frame.grid(row=2, column=0, padx=(20,10), pady=(0,20), sticky="nsw")
         self.sidebar_frame.grid_rowconfigure(6, weight=1) # Pushes logout to bottom
 
-        sidebar_button_definitions = [ # Renamed for clarity
+        sidebar_button_definitions = [
             ("Users", AdminUsersScreen, "Users Management"),
             ("Orders", AdminOrdersScreen, "Orders Management"),
             ("Restaurants", AdminRestaurantsScreen, "Restaurants Management"),
-            ("Menus", AdminMenusScreen, "Menus Management"),
+            ("Order History", None, "Order History"),
             ("Reviews", AdminReviewsScreen, "Reviews Management")
         ]
 
         for i, (text, screen_class, screen_title) in enumerate(sidebar_button_definitions):
-            button = ctk.CTkButton(
-                self.sidebar_frame,
-                text=text,
-                # Pass button's own text, screen class, and screen title to switch_screen
-                command=lambda sc=screen_class, st=screen_title, btn_text=text: self.switch_screen(sc, st, btn_text),
-                font=ctk.CTkFont(family=FONT_FAMILY, size=BUTTON_FONT_SIZE + 2),
-                fg_color=ADMIN_BUTTON_FG_COLOR,
-                hover_color=ADMIN_BUTTON_HOVER_COLOR,
-                text_color=ADMIN_BUTTON_TEXT_COLOR,
-                anchor="w",
-                corner_radius=8
-            )
+            if text == "Order History":
+                button = ctk.CTkButton(
+                    self.sidebar_frame,
+                    text=text,
+                    command=self.show_order_history,
+                    font=ctk.CTkFont(family=FONT_FAMILY, size=BUTTON_FONT_SIZE + 2),
+                    fg_color=ADMIN_BUTTON_FG_COLOR,
+                    hover_color=ADMIN_BUTTON_HOVER_COLOR,
+                    text_color=ADMIN_BUTTON_TEXT_COLOR,
+                    anchor="w",
+                    corner_radius=8
+                )
+            else:
+                button = ctk.CTkButton(
+                    self.sidebar_frame,
+                    text=text,
+                    command=lambda sc=screen_class, st=screen_title, btn_text=text: self.switch_screen(sc, st, btn_text),
+                    font=ctk.CTkFont(family=FONT_FAMILY, size=BUTTON_FONT_SIZE + 2),
+                    fg_color=ADMIN_BUTTON_FG_COLOR,
+                    hover_color=ADMIN_BUTTON_HOVER_COLOR,
+                    text_color=ADMIN_BUTTON_TEXT_COLOR,
+                    anchor="w",
+                    corner_radius=8
+                )
             button.grid(row=i, column=0, padx=10, pady=10, sticky="ew")
-            self.sidebar_buttons_widgets.append(button) # Store button
+            self.sidebar_buttons_widgets.append(button)
+
+        # --- Summary Stats Panel ---
+        stats_frame = ctk.CTkFrame(self, fg_color=ADMIN_BACKGROUND_COLOR)
+        stats_frame.grid(row=1, column=1, padx=(10,20), pady=(0,0), sticky="new")
+        stats_frame.grid_columnconfigure((0,1,2,3), weight=1)
+
+        # Fetch stats
+        user_count = len(User.get_all_users())
+        restaurant_count = len(Restaurant.get_all())
+        order_count = len(Order.get_all_orders())
+        review_count = len(Review.get_all_reviews())
+
+        stat_labels = [
+            ("Users", user_count),
+            ("Restaurants", restaurant_count),
+            ("Orders", order_count),
+            ("Reviews", review_count)
+        ]
+        for i, (label, count) in enumerate(stat_labels):
+            stat = ctk.CTkLabel(stats_frame, text=f"{label}\n{count}", justify="center",
+                                font=ctk.CTkFont(family=FONT_FAMILY, size=HEADING_FONT_SIZE, weight="bold"),
+                                text_color=ADMIN_PRIMARY_ACCENT_COLOR)
+            stat.grid(row=0, column=i, padx=20, pady=10, sticky="nsew")
 
         # Content Frame
         self.content_frame = ctk.CTkFrame(self, fg_color=ADMIN_BACKGROUND_COLOR, corner_radius=10) # Adjusted fg_color
-        self.content_frame.grid(row=1, column=1, padx=(10,20), pady=(0,20), sticky="nsew")
+        self.content_frame.grid(row=2, column=1, padx=(10,20), pady=(0,20), sticky="nsew")
         self.content_frame.grid_columnconfigure(0, weight=1)
         self.content_frame.grid_rowconfigure(0, weight=1)
         
@@ -116,6 +155,13 @@ class AdminDashboard(ctk.CTkFrame):
         
         self.current_screen_frame = screen_class(self.content_frame, self.app_callbacks, self.loggedInUser)
         self.current_screen_frame.grid(row=0, column=0, sticky="nsew", padx=0, pady=0)
+
+    def show_order_history(self):
+        # Only show order history if AdminOrdersScreen is loaded
+        if not isinstance(self.current_screen_frame, AdminOrdersScreen):
+            self.switch_screen(AdminOrdersScreen, "Order History", "Order History")
+        if hasattr(self.current_screen_frame, 'show_order_history'):
+            self.current_screen_frame.show_order_history()
 
     def show(self):
         self.lift()

@@ -16,6 +16,8 @@ from gui_constants import (
 from restaurants.models import Restaurant, MenuItem
 from CTkTable import CTkTable
 from tkinter import messagebox
+from reviews.models import get_reviews_for_restaurant, Review
+import datetime
 
 # Setup logger for this module
 logger = logging.getLogger("swigato_app.restaurant_management_screen")
@@ -666,9 +668,85 @@ class RestaurantManagementScreen(ctk.CTkToplevel):
         tab_frame.configure(fg_color=ADMIN_FRAME_FG_COLOR)
         tab_frame.grid_columnconfigure(0, weight=1)
         tab_frame.grid_rowconfigure(1, weight=1)
-        ctk.CTkLabel(tab_frame, text="Reviews Management (Under Construction)", 
-                     font=ctk.CTkFont(family=FONT_FAMILY, size=HEADING_FONT_SIZE),
-                     text_color=ADMIN_TEXT_COLOR).pack(pady=20, padx=20, anchor="center")
+
+        self.reviews_table_frame = ctk.CTkFrame(tab_frame, fg_color="transparent")
+        self.reviews_table_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+        self.reviews_table_frame.grid_columnconfigure(0, weight=1)
+        self.reviews_table_frame.grid_rowconfigure(0, weight=1)
+
+        self._load_reviews()
+
+    def _load_reviews(self):
+        for widget in self.reviews_table_frame.winfo_children():
+            widget.destroy()
+
+        if not self.restaurant_id:
+            ctk.CTkLabel(self.reviews_table_frame, text="Save the restaurant details first to manage reviews.",
+                         font=ctk.CTkFont(family=FONT_FAMILY, size=BODY_FONT_SIZE),
+                         text_color=ADMIN_TEXT_COLOR).pack(expand=True, anchor="center", padx=20, pady=20)
+            return
+
+        reviews = get_reviews_for_restaurant(self.restaurant_id)
+        self.reviews_in_table = reviews
+
+        headers = ["ID", "User", "Rating", "Comment", "Date", "Actions"]
+        table_data = [headers]
+        for review in reviews:
+            date_str = review.review_date.strftime('%Y-%m-%d %H:%M') if isinstance(review.review_date, datetime.datetime) else str(review.review_date)
+            comment_short = (review.comment[:40] + '...') if review.comment and len(review.comment) > 43 else (review.comment or "")
+            table_data.append([
+                review.review_id,
+                review.username,
+                f"{review.rating}/5",
+                comment_short,
+                date_str,
+                "Delete"
+            ])
+
+        if len(table_data) == 1:
+            ctk.CTkLabel(self.reviews_table_frame, text="No reviews found for this restaurant.",
+                         font=ctk.CTkFont(family=FONT_FAMILY, size=BODY_FONT_SIZE),
+                         text_color=ADMIN_TEXT_COLOR).pack(expand=True, anchor="center", padx=20, pady=20)
+            return
+
+        cell_font = ctk.CTkFont(family=FONT_FAMILY, size=BODY_FONT_SIZE - 1)
+        self.reviews_table = CTkTable(master=self.reviews_table_frame,
+                                      values=table_data,
+                                      font=cell_font,
+                                      header_color=ADMIN_TABLE_HEADER_BG_COLOR,
+                                      text_color=ADMIN_TABLE_TEXT_COLOR,
+                                      hover_color=ADMIN_PRIMARY_ACCENT_COLOR,
+                                      colors=[ADMIN_TABLE_ROW_LIGHT_COLOR, ADMIN_TABLE_ROW_DARK_COLOR],
+                                      corner_radius=6,
+                                      border_width=1,
+                                      border_color=ADMIN_TABLE_BORDER_COLOR,
+                                      command=self._on_review_table_cell_click,
+                                      wraplength=150)
+        self.reviews_table.pack(expand=True, fill="both", padx=5, pady=5)
+
+    def _on_review_table_cell_click(self, event_data):
+        row_clicked = event_data["row"]
+        column_clicked = event_data["column"]
+        if row_clicked == 0:
+            return
+        data_row_idx = row_clicked - 1
+        if not (0 <= data_row_idx < len(self.reviews_in_table)):
+            return
+        review = self.reviews_in_table[data_row_idx]
+        actions_column_index = 5
+        if column_clicked == actions_column_index:
+            self._delete_review(review.review_id)
+
+    def _delete_review(self, review_id):
+        confirm = messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this review?")
+        if not confirm:
+            return
+        success = Review.delete_review(review_id)
+        if success:
+            messagebox.showinfo("Success", "Review deleted successfully.")
+            self._load_reviews()
+        else:
+            messagebox.showerror("Error", "Failed to delete review. It may not exist.")
 
     def _load_restaurant_data_into_forms(self):
         if not self.current_restaurant:
