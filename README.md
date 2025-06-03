@@ -1,4 +1,4 @@
-# Swigato 🍔🍕🍟 – The Food App I Wish My Hostel Had!
+# Swigato 🍔🍕🍟 – The Food App I Wish My Hostel Had
 
 ## *A Python Project by Amartya Vishwakarma (a.k.a. That Guy Who Codes at 2AM)*
 
@@ -51,28 +51,115 @@ This project started as a CLI app for a college assignment, but then I got carri
 ## 🏗️ How It’s All Organized (a.k.a. My Digital Mess)
 
 ```text
-swigato_project/
-├── gui_app.py                  # Main GUI launcher
-├── cli_app.py                  # The OG CLI version
-├── gui_components/             # All the GUI screens (login, signup, menu, cart, admin, etc.)
-├── admin/                      # CLI admin logic (legacy, but still kicking)
-├── users/                      # User models, auth, validation
-├── restaurants/                # Restaurant & menu models
-├── orders/                     # Order logic
-├── reviews/                    # Review system
-├── cart/                       # Shopping cart logic
-├── cli/                        # CLI helpers
-├── config/                     # Database setup
-├── data/                       # swigato.db (the precious), logs, etc.
-├── assets/                     # Food & restaurant images
-├── utils/                      # Helper scripts (validation, logger, etc.)
-├── requirements.txt            # All the Python magic you need
-└── README.md                   # This masterpiece
+├── admin
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc (133.0 B)
+│   │   └── actions.cpython-312.pyc (24.1 KB)
+│   ├── __init__.py
+│   └── actions.py (20.6 KB)
+├── assets
+│   ├── menu_items
+│   │   ├── menu_1.jpeg (12.9 KB)
+│   │   ├── menu_2.jpeg (12.1 KB)
+│   │   ├── menu_3.jpeg (14.9 KB)
+│   │   ├── menu_4.jpeg (13.8 KB)
+│   │   ├── menu_5.jpeg (12.0 KB)
+│   │   └── menu_default.jpg (44.2 KB)
+│   └── restaurants
+│       ├── badkul.jpeg (9.6 KB)
+│       ├── default_restaurant.jpg (78.0 KB)
+│       ├── resort-4471852_1280.jpg (250.6 KB)
+│       ├── restaurant_test.jpg (8.3 MB)
+│       ├── restaurent_a.jpeg (20.2 KB)
+│       ├── restaurent_b.jpeg (10.3 KB)
+│       ├── restaurent_c.jpeg (9.8 KB)
+│       └── The_Great_Hall_Baluchi.jpg (279.4 KB)
+├── cart
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc (132.0 B)
+│   │   └── models.cpython-312.pyc (6.8 KB)
+│   ├── __init__.py
+│   └── models.py (4.3 KB)
+├── data
+│   ├── remember_me.json (23.0 B)
+│   ├── swigato_app.log (587.6 KB)
+│   └── swigato.db (68.0 KB)
+├── delivery
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc (136.0 B)
+│   │   └── tracker.cpython-312.pyc (857.0 B)
+│   ├── __init__.py
+│   └── tracker.py (573.0 B)
+├── gui_components
+│   ├── admin_dashboard.py (8.0 KB)
+│   ├── admin_menus_screen.py (838.0 B)
+│   ├── admin_orders_screen.py (8.7 KB)
+│   ├── admin_restaurants_screen_new.py (9.8 KB)
+│   ├── admin_restaurants_screen.py (9.8 KB)
+│   ├── admin_reviews_screen.py (4.7 KB)
+│   ├── admin_screen.py (27.3 KB)
+│   ├── admin_users_screen_backup.py (39.1 KB)
+│   ├── admin_users_screen.py (39.1 KB)
+│   ├── cart_screen.py (7.9 KB)
+│   ├── login_screen.py (9.6 KB)
+│   ├── main_app_screen.py (12.7 KB)
+│   ├── menu_screen.py (22.2 KB)
+│   ├── restaurant_management_screen.py (52.6 KB)
+│   ├── review_submission_screen.py (6.8 KB)
+│   ├── signup_screen.py (10.5 KB)
+│   └── swigato_dialog.py (3.5 KB)
+├── orders
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc (134.0 B)
+│   │   └── models.cpython-312.pyc (11.9 KB)
+│   ├── __init__.py
+│   └── models.py (9.4 KB)
+├── restaurants
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc (139.0 B)
+│   │   └── models.cpython-312.pyc (30.1 KB)
+│   ├── __init__.py
+│   └── models.py (23.4 KB)
+├── reviews
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc (135.0 B)
+│   │   └── models.cpython-312.pyc (11.8 KB)
+│   ├── __init__.py
+│   └── models.py (10.7 KB)
+├── users
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc (133.0 B)
+│   │   ├── auth.cpython-312.pyc (2.1 KB)
+│   │   └── models.cpython-312.pyc (11.6 KB)
+│   ├── __init__.py
+│   ├── auth.py (1.6 KB)
+│   └── models.py (8.4 KB)
+├── utils
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc (133.0 B)
+│   │   ├── database.cpython-312.pyc (9.8 KB)
+│   │   ├── logger.cpython-312.pyc (2.1 KB)
+│   │   └── validation.cpython-312.pyc (6.9 KB)
+│   ├── __init__.py
+│   ├── database.py (7.5 KB)
+│   ├── image_loader.py (1.4 KB)
+│   ├── logger.py (1.4 KB)
+│   ├── update_schema.py (2.3 KB)
+│   └── validation.py (7.8 KB)
+├── .gitignore (1.2 KB)
+├── gui_app.py (15.4 KB)
+├── gui_constants.py (3.8 KB)
+├── main.py (22.4 KB)
+├── README.md (6.5 KB)
+├── requirements.txt (42.0 B)
+├── swigato_icon.ico (22.2 KB)
+└── swigato_icon.png (1.2 MB)
+
 ```
 
 ---
 
-## 🖥️ Main Features (a.k.a. Why My Friends Actually Use This)
+## 🖥️ Main Features
 
 - **Modern GUI**: CustomTkinter-powered, looks good even at 3AM.
 - **Authentication**: Sign up, log in, bcrypt-hashed passwords (no plain text, promise).
@@ -113,7 +200,8 @@ swigato_project/
    Or, for nostalgia, run the CLI version:
 
    ```bash
-   python cli_app.py
+   
+   python main.py
    ```
 
 4. **First run?**
@@ -149,11 +237,9 @@ swigato_project/
 
 ---
 
-## 👨‍💻 About Me
+## 👨‍💻 How it completed
 
-**Amartya Vishwakarma** – Just a regular college student who loves food, code, and making stuff that (hopefully) works.
-
-This project is the result of too much caffeine, too little sleep, and a lot of Stack Overflow. If you read this far, you deserve a samosa. Or at least a star on GitHub. 😉
+This project is the result of too much caffeine, too little sleep, and a lot of Stack Overflow and of course **AI (My Partner in crime)**. If you read this far, you deserve a samosa. Or at least a star on GitHub. 😉
 
 *“Why settle for basic when you can go big?”* – That’s how Swigato happened.
 
